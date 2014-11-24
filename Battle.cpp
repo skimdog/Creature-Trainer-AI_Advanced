@@ -170,6 +170,4 @@ void creatureRest(Creature& rester, bool isPlayer, stringstream& ss) {
     
     ss << resterName << " rests and regains ";
     ss << increase << " health.\n";
-    
-    rester.rest();
 }
