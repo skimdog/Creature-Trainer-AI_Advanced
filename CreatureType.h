@@ -35,7 +35,7 @@ public:
     const static int    NUM_ELEMENTS = 8;
     const static string CREATURE_NAMES[];
     const static string ELEMENT_NAMES[];
-    const static int    TYPE_NAME_LENGTH = 9;
+    const static int    TYPE_NAME_LENGTH = 10;
     const static int    ELEM_NAME_LENGTH = 7;
     
     static std::vector<CreatureType> TYPES;

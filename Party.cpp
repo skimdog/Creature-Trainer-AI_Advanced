@@ -10,19 +10,18 @@
 #include "Creature.h"
 #include "EECSRandom.h"
 #include "PrintHelper.h"
-#include <unordered_set>
 
 Party::Party() {
     // Makes a random Party of Creatures
-	std::unordered_set<int> typesAlreadyUsed;
     for (int i=0; i<MAX_PARTY_SIZE; i++) {
-		int nextType = EECSRandom::range(0, CreatureType::NUM_TYPES); 
-		//while we already have a pokemon of that type get a new type
-		while (typesAlreadyUsed.count(nextType)){
-			nextType = EECSRandom::range(0, CreatureType::NUM_TYPES);
-		}
-		creatures[i] = Creature::factory(nextType);
-		typesAlreadyUsed.insert(nextType);
+        // TODO: Make sure the Trainer doesn't get two of the same CreatureType
+        Creature temp = Creature::factory(EECSRandom::range(0, CreatureType::NUM_TYPES));
+        for (int j = 0; j < i; ++j){
+            while (creatures[j] == temp){
+                temp = Creature::factory(EECSRandom::range(0, CreatureType::NUM_TYPES));
+            }
+        }
+        creatures[i] = temp;
     }
     
 }
@@ -72,6 +71,24 @@ void Party::restInactive() {
         if (i != activeCreature) {
             creatures[i].rest();
         }
+    }
+}
+
+int Party::getMaxLevelCaught(){
+    for (int i=0; i<MAX_PARTY_SIZE; i++) {
+        if (creatures[i].getLevel() > maxLevelCaught) {
+            maxLevelCaught = creatures[i].getLevel();
+        }
+    }
+    return maxLevelCaught;
+}
+
+void Party::decreaseBoostTurns() {
+    if (attackBoostTurns > 0) {
+        attackBoostTurns--;
+    }
+    if (defenseBoostTurns > 0) {
+        defenseBoostTurns--;
     }
 }
 

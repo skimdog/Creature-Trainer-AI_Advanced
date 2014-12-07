@@ -4,6 +4,8 @@
 #include <iostream>
 #include <sstream>
 #include "Creature.h"
+#include "Item.h"
+#include <string>
 
 class PrintHelper {
 public:
@@ -23,7 +25,30 @@ public:
      
      */
     static void printTeamStatus(Creature creatures[], int currCreatureIndex, stringstream & ss);
+    
+    /**
+     * Requires: Nothing.
+     * Modifies: ss
+     * Effects:  For all possible items, prints the counts that the Trainer
+                    currently has in the following format:
+     
+     "NOTHING", "POTION", "SHIELD", "DMG BOOST",
+     "SCROLL-A","SCROLL-B","SCROLL-C","SCROLL-D","SCROLL-E","SCROLL-F","SCROLL-G",
+     "REVIVE", "LASSO"}
 
+| POTION __ | SHIELD __ | DMG BOOST __ | REVIVE __ | LASSO __ |
+| S-A __ | S-B __ | S-C __ | S-D __ | S-E __ | S-F __ | S-G __ |
+     */
+    static void printItems(const Item& item, stringstream& ss);
+  
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
+     * Effects: returns the int as a string. 
+     *          puts a space before it if it is 1 digit.
+     */
+    static string formatItemCount(int i);
+    
     /**
      * Requires: Nothing.
      * Modifies: ss
@@ -40,6 +65,14 @@ public:
      * Effects:  prints an error if the player chooses an invalid move
      */
     static void printError(stringstream& ss);
+    
+    /**
+     * Requires: Nothing.
+     * Modifies: ss
+     * Effects:  prints an error if the player chooses an invalid move for the
+     *             use item move between battles
+     */
+    static void printError2(stringstream& ss);
 
     /**
      * Requires: Nothing.
@@ -103,6 +136,15 @@ ________________________________________________________________________________
      
      */
     static void printHRL(stringstream& ss);
+    
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing
+     * Effects:  Pads a string to a specific length by adding spaces.
+     */
+    static string padString(string sIn, int len);
+    static void   padString(stringstream& ss, int len);
+    
 };
 
 #endif
