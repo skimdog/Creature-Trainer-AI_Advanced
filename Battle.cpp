@@ -6,7 +6,7 @@
 #include "EECSRandom.h"
 #include "Battle.h"
 #include "PrintHelper.h"
-#include "Party.h" 
+#include "Party.h"
 #include "Item.h"
 
 using namespace std;
@@ -20,17 +20,16 @@ using namespace std;
 void runBattle(Trainer &player1, Party &party, Item &items, stringstream& ss,
                int winCount, int& moveCount, int& illegalMoveCount){
     
-
-    // WHAT SHOULD THE ENEMIES BE?? This generates an enemy
+    // generate enemy
     int tNum = EECSRandom::range(0,CreatureType::NUM_TYPES);
-
+    
     Creature enemy;
     int maxLevel = winCount / 20;
     if(maxLevel >= 9) {
         maxLevel = 9;
     }
     enemy = Creature::factory( tNum, EECSRandom::range(0, maxLevel + 1) );
-
+    
     //This simply introduces the enemy. The trainer can make the first move.
     PrintHelper::printHR(ss);
     PrintHelper::printWinCount(winCount, ss);
@@ -65,7 +64,7 @@ void runBattle(Trainer &player1, Party &party, Item &items, stringstream& ss,
         moveCount++;
         
         parseMove(playerMove, party, items, enemy, ss, illegalMoveCount);
-       
+        
         // Everyone in the party who is not the active creature rest()s
         party.restInactive();
         
@@ -85,10 +84,6 @@ void runBattle(Trainer &player1, Party &party, Item &items, stringstream& ss,
         //If you defeat an enemy, you regenerate some health and pick up an item
         ss << "\nYou have defeated the Enemy ";
         ss << enemy.getTypeName(0) << "! Congratulations!\n";
-        
-        //            ss << "Your party also gets to rest a turn and regains some health.\n\n";
-        //            party.getActiveCreature().rest();
-        //            party.restInactive();
         
         string newItem = Item::randomItem();
         if ( newItem.compare("nothing") == 0 ) {
@@ -122,7 +117,7 @@ void runBattle(Trainer &player1, Party &party, Item &items, stringstream& ss,
         ss  << "Trainer, make your move.\n"
         << "(s#-Swap to slot #, r-Rest, item code, or Collar(co#)): ";
         
-        // we get a player move as above, but the only legal moves are now i and n
+        // we get a player move as above, but attacking and scrolls are illegal
         playerMove = player1.makeMove(ss);
         moveCount++;
         
@@ -149,7 +144,7 @@ void parseMove(string playerMove, Party &party, Item &items, Creature& enemy,
     switch (playerMove[0]){
         case 'a': { // Attack
             if (playerMove.length()>1) { // This is an AtkBst(ab)
-                // Tell the item function to manage this
+                                         // Tell the item function to manage this
                 items.useItem(playerMove, party, enemy, ss, illegalMoveCount);
                 break;
             }
@@ -161,11 +156,10 @@ void parseMove(string playerMove, Party &party, Item &items, Creature& enemy,
         }
             
         case 's': { // Swap for another party member
-            // You cannot swap to a fainted party member
+                    // You cannot swap to a fainted party member
             if (playerMove.length() < 2) {
+                PrintHelper::printError(ss);
                 illegalMoveCount++;
-                //                ss << "Illegal move: '" << playerMove << "' is not a valid!";
-                ss << "ERROR: INVALID MOVE";
                 break;
             }
             switch (playerMove[1]) {
@@ -184,7 +178,7 @@ void parseMove(string playerMove, Party &party, Item &items, Creature& enemy,
                 default: {
                     // Use this as a swap
                     int oldIndex = party.getActiveCreatureNum();
-                    int swapIndex = playerMove[1] - '1'; //because atoi won't work
+                    int swapIndex = playerMove[1] - '1';
                     if (swapIndex >= Party::MAX_PARTY_SIZE || swapIndex < 0) {
                         PrintHelper::printError(ss);
                         illegalMoveCount++;
@@ -231,6 +225,96 @@ void parseMove(string playerMove, Party &party, Item &items, Creature& enemy,
     
 }
 
+void parseMovePostBattle(string playerMove, Party &party, Item &items, Creature& enemy,
+                         stringstream& ss, int& illegalMoveCount){
+    
+    ss.str("");
+    ss << "\n\n";
+    PrintHelper::printHRL(ss);
+    ss << "\n";
+    
+    // Act on it
+    switch (playerMove[0]){
+        case 'a': { // Attack not allowed, but Attack boost is
+            if (playerMove.length()>1) { // This is an AtkBst(ab)
+                                         // Tell the item function to manage this
+                items.useItem(playerMove, party, enemy, ss, illegalMoveCount);
+                break;
+            }
+            // Attack
+            PrintHelper::printError(ss);
+            illegalMoveCount++;
+            break;
+        }
+            
+        case 's': { // Swap for another party member
+                    // You cannot swap to a fainted party member
+            if (playerMove.length() < 2) {
+                PrintHelper::printError(ss);
+                illegalMoveCount++;
+                break;
+            }
+            switch (playerMove[1]) {
+                case 'a':  // Check for scroll usage - NOT allowed at this stage
+                case 'b':
+                case 'c':
+                case 'd':
+                case 'e':
+                case 'f':
+                case 'g':
+                case 'h': {
+                    // Tell the item function to manage this
+                    PrintHelper::printError(ss);
+                    illegalMoveCount++;
+                    break;
+                }
+                default: {
+                    // Use this as a swap
+                    int oldIndex = party.getActiveCreatureNum();
+                    int swapIndex = playerMove[1] - '1';
+                    if (swapIndex >= Party::MAX_PARTY_SIZE || swapIndex < 0) {
+                        PrintHelper::printError(ss);
+                        illegalMoveCount++;
+                    } else {
+                        party.setActiveCreatureNum(swapIndex);
+                        if (party.getActiveCreatureNum() == oldIndex) {
+                            ss << party.creatures[swapIndex].getTypeName();
+                            ss << " couldn't swap in! ";
+                            ss << party.creatures[oldIndex].getTypeName();
+                            ss << " is still fighting.\n";
+                            illegalMoveCount++;
+                        } else {
+                            ss << party.creatures[oldIndex].getTypeName();
+                            ss << " swaps out, and ";
+                            ss << party.creatures[swapIndex].getTypeName();
+                            ss << " swaps in!\n";
+                        }
+                    }
+                    break;
+                }
+            }
+            break;
+        }
+            
+        case 'r': { // Rest or Revive
+            if (playerMove.length() > 1) {
+                // Tell the item function to manage this
+                items.useItem(playerMove, party, enemy, ss, illegalMoveCount);
+            } else {
+                // Rest and regain a bit of health. Usually a bad move.
+                creatureRest(party.getActiveCreature(), true, ss);
+            }
+            break;
+        }
+            
+        default: {
+            // Pass any unknown command to the item command parser
+            items.useItem(playerMove, party, enemy, ss, illegalMoveCount);
+            break;
+        }
+    }
+    
+}
 
 
 bool creatureAttack(Creature& attacker, Creature& defender, bool isPlayer,

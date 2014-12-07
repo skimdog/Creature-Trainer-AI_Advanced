@@ -19,6 +19,10 @@ void runBattle(Trainer &player1, Party &party, Item &items, stringstream& ss,
 void parseMove(string playerMove, Party &party, Item &items, Creature& enemy,
                stringstream& ss, int& illegalMoveCount);
 
+//Same as above but attack and scrolls not allowed.
+void parseMovePostBattle(string playerMove, Party &party, Item &items, Creature& enemy,
+                         stringstream& ss, int& illegalMoveCount);
+
 /**
  * Requires: Nothing.
  * Modifies: defender, ss
@@ -29,8 +33,6 @@ void parseMove(string playerMove, Party &party, Item &items, Creature& enemy,
  */
 bool creatureAttack(Creature& attacker, Creature& defender, bool isPlayer,
                     Party& party, stringstream& ss);
-//bool creatureAttack(Party& party, Creature& enemy, bool isPlayer,
-//                    stringstream& ss);
 
 /**
  * Requires: Nothing.
