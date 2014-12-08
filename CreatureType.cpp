@@ -6,6 +6,7 @@
 //  Copyright (c) 2014 Jeremy Richard Gibson. All rights reserved.
 //
 
+#include <vector>
 #include "CreatureType.h"
 #include "EECSRandom.h"
 using namespace std;
@@ -20,7 +21,7 @@ const string CreatureType::CREATURE_NAMES[] = { "Axolotyl", "Bittern", "C-lacant
 const string CreatureType::ELEMENT_NAMES[] = { "Air", "Bombast", "Cool", "Dark",
 "Earth", "Funk", "Gamma", "Hammer" };
 
-std::vector<CreatureType> CreatureType::TYPES = {};
+std::vector<CreatureType> CreatureType::TYPES;
 
 CreatureType::CreatureType() {
     // Do nothing
@@ -32,7 +33,8 @@ CreatureType::CreatureType(int cType) {
 }
 
 void CreatureType::randomizeTypes() {
-    CreatureType::TYPES.resize(NUM_TYPES);
+    vector<int>::size_type num_types = NUM_TYPES;
+    CreatureType::TYPES.resize(num_types);
     for (int i = 0; i<NUM_TYPES; i++) {
         CreatureType ct;
         ct.setType(i);
