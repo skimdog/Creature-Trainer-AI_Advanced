@@ -19,8 +19,8 @@ public:
 
     Creature creatures[MAX_PARTY_SIZE];
     
-    int attackBoostTurns = 0;
-    int defenseBoostTurns = 0;
+    int attackBoostTurns;
+    int defenseBoostTurns;
     
     /**
      * Requires: Nothing.
@@ -90,8 +90,8 @@ public:
     int getMaxLevelCaught();
     
 private:
-    int activeCreature = 0;
-    int maxLevelCaught = 0;
+    int activeCreature;
+    int maxLevelCaught;
 };
 
 #endif /* defined(__CreatureTrainer__Party__) */

@@ -12,6 +12,11 @@
 #include "PrintHelper.h"
 
 Party::Party() {
+    attackBoostTurns = 0;
+    defenseBoostTurns = 0;
+    activeCreature = 0;
+    maxLevelCaught = 0;
+    
     // Makes a random Party of Creatures
     for (int i=0; i<MAX_PARTY_SIZE; i++) {
         // TODO: Make sure the Trainer doesn't get two of the same CreatureType
