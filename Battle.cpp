@@ -97,8 +97,10 @@ void runBattle(Trainer &player1, Party &party, Item &items, stringstream& ss,
         // Leveling
         bool levelUp = party.getActiveCreature().updateXP();
         if(levelUp){
+            int health = party.getActiveCreature().getHealthCurr();
             ss << party.getActiveCreature().getTypeName() << " grows to level "
-            << party.getActiveCreature().getLevel() << "!!!\n\n";
+            << party.getActiveCreature().getLevel() << " and regains full "
+            << health << "/" << health << " health!!!\n\n";
         }
         
         PrintHelper::printHR(ss);

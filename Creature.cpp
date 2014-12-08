@@ -116,6 +116,7 @@ void Creature::setLevel(int num) {
     level = num;
     healthMax = getCreatureType().getHealthMaxPerLevel() * level 
               + getCreatureType().getHealthMaxBase();
+    healthCurr = healthMax;
 }
 
 int Creature::getXp() {
@@ -149,6 +150,7 @@ bool Creature::updateLevel(){
         ++level;
         //POSSIBLY UPDATE CURRENT HEALTH
         healthMax += getCreatureType().getHealthMaxPerLevel();
+        healthCurr = healthMax;
         //attack stats update handled in getAttackStrength()
         return true;
     }
