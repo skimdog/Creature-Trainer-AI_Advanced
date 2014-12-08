@@ -29,7 +29,7 @@ Item::Item(){
         itemCounts[i] = STARTING_ITEM_COUNT;
     }
     // Special case for Collars
-    itemCounts[4] = STARTING_COLLAR_COUNT;
+    //itemCounts[4] = STARTING_COLLAR_COUNT;
 }
 
 
