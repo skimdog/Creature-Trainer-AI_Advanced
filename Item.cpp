@@ -28,6 +28,8 @@ Item::Item(){
     for (int i= 0; i < NUM_ITEMS; ++i) {
         itemCounts[i] = STARTING_ITEM_COUNT;
     }
+    // Special case for Collars
+    itemCounts[4] = STARTING_COLLAR_COUNT;
 }
 
 
@@ -139,12 +141,14 @@ string Item::useItem(string itemCommand, Party& party, Creature& enemy,
             case 3: { // Revive(re#)
                 if (itemCommand.length() < 3) {
                     badMove = true;
+                    useItem = false;
                     break;
                 }
                 // Revive a Creature
                 cNum = itemCommand[2] - '1';
                 if (cNum < 0 || cNum > 3) {
                     badMove = 1;
+                    useItem = false;
                     break;
                 }
                 Creature& cr = party.creatures[cNum];
@@ -152,6 +156,7 @@ string Item::useItem(string itemCommand, Party& party, Creature& enemy,
                     badMove = -1;
                     ss << "Illegal Move: You tried to Revive " << cr.getTypeName()
                     << " in slot " << (cNum+1) << ", but it is not fainted.\n";
+                    useItem = false;
                     break;
                 }
                 cr.setHealthCurr(Item::REVIVE_HEALTH);
@@ -167,12 +172,14 @@ string Item::useItem(string itemCommand, Party& party, Creature& enemy,
                     badMove = -1;
                     ss << "Illegal Move: You tried to Collar " << enemy.getTypeName()
                     << ", but it is not fainted.\n";
+                    useItem = false;
                     break;
                 }
                 if (itemCommand.length() < 3) {
                     badMove = -1;
                     ss << "Illegal Move: You tried to Collar " << enemy.getTypeName()
                     << ", but did not specify a party member to replace.\n";
+                    useItem = false;
                     break;
                 }
                 cNum = itemCommand[2] - '1';
@@ -180,6 +187,7 @@ string Item::useItem(string itemCommand, Party& party, Creature& enemy,
                     badMove = -1;
                     ss << "Illegal Move: You tried to Collar " << enemy.getTypeName()
                     << ", but did not specify a valid member to replace.\n";
+                    useItem = false;
                     break;
                 }
                 // This is a valid swap, so make it so #1!

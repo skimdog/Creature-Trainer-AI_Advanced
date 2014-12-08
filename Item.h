@@ -37,6 +37,7 @@ public:
     
     // Change this to have items when the game starts.
     const static int STARTING_ITEM_COUNT = 0;
+    const static int STARTING_COLLAR_COUNT = 20;
     
 private:
     int itemCounts[NUM_ITEMS];
