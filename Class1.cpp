@@ -90,3 +90,15 @@ bool SwapOrAttack::areOthersGonnaDie(int partyHealths[], int partyDamages[])
     return true;
 }
 
+bool SwapOrAttack::isLastCreatureStanding(int partyHealths[], int activeSlot)
+{
+    for(int i = 0; i < PARTY_SIZE; i++)
+    {
+        if(i != activeSlot && partyHealths[i] > 0)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+

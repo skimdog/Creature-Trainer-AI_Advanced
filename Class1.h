@@ -41,6 +41,7 @@ public:
      * Requires: Nothing.
      * Modifies: Nothing.
      * Effects: Swaps to creature with strength element equal to enemy's attack element
+                If none, returns 'a'
      */
     string swapToStrElement(string enemyAtkElement, string partyStrElements[]);
     
@@ -48,8 +49,16 @@ public:
      * Requires: Nothing.
      * Modifies: Nothing.
      * Effects:  Swaps to creature with attack element equal to enemy's weakness
+                 If none, returns 'a'
      */
     string swapToAtkElement(string enemyWeakElement, string partyAtkElements[]);
+    
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
+     * Effects:  Returns true if attack element equal to enemy's strength element
+     */
+    bool attackIsNotEffective(string enemyStrElement, string atkElement);
     
     /**
      * Requires: Nothing.
@@ -66,6 +75,20 @@ public:
      one of other creatures besides active one
      */
     bool areOthersGonnaDie(int partyHealths[], int partyDamages[]);
+    
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
+     * Effects:  Returns true if other three creatures have fainted
+     */
+    bool isLastCreatureStanding(int partyHealths[], int activeSlot);
+    
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
+     * Effects:  Returns true if creature at specific slot is fainted
+     */
+    bool isFainted(int slot);
     
 private:
     
