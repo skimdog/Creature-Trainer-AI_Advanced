@@ -10,6 +10,14 @@
 
 #include "Class3.h"
 
+string CaptureCreature(int enemyBaseHealth, int enemyBaseAttack, int partyAttacks[], int partyHealths[]);
+/*int enemyUsefulness = enemyBaseHealth + enemyBaseAttack;
+for (i=0, i<=4, i++){
+    if enemyUsefulness > (partyAttacks[i]+partyHealths[i]){
+        return 's' i;
+    }
+}
+};*/
 
 // WE ARE GONNA CATCH  STUFF!!!!!!!!! YEAH!
 

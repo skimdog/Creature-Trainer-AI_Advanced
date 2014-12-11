@@ -14,7 +14,14 @@
 
 // vvvvvv Your implementations go between this line…
 
+#include <iostream>
+using namespace std;
 
+class Capture{
+public:
+    string CaptureCreature(int enemyBaseHealth, int enemyBaseAttack);
+    
+};
 
 
 
