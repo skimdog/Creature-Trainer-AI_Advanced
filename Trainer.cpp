@@ -19,6 +19,8 @@
 #include "Class3.h"
 #include "Class4.h"
 #include "Class5.h"
+#include "CreatureType.h"
+#include "Item.h"
 
 //#include "CreatureType.h"
 
@@ -128,17 +130,21 @@ string Trainer::makeMove(stringstream& situation) {
         creatureParty[j] = creatureHealthBits[j];
     }
     
-    //* STORING NAMES AND CURRENT HEALTHS IN partyNames & partyHealths *
+    //* STORING NAMES, LEVELS, ATTACK ELEMENTS, CURRENT ATTACKS, & CURRENT HEALTHS in arrays *
     
-    //storing info about active creature
+    //STORE INFO ABOUT ACTIVE CREATURE
     bool isActive; //true when name starts with '*'
     string activeName = "";
+    int activeLevel  = 0;
     int activeHealth = 0;
+    string activeAtkElement  = "";
+    string activeWeakElement = "";
+    string activeStrElement  = "";
     //int activeMaxHealth = 0;
     int activeSlot = 0; // [1, 2, 3, 4]
     
-    for (int i = 1; i < PARTY_SIZE; i++) {
-        
+    for (int i = 1; i < PARTY_SIZE; i++)
+    {
         isActive = false;
         // cout just for testing
         //cout << creatureHealthBits[i] << "\n";
@@ -147,27 +153,55 @@ string Trainer::makeMove(stringstream& situation) {
         stringstream ss;
         ss << creatureParty[i];
         
-        // For example, we have a stringstream ss containing " *Jackal   10/10 "
-        // pull the name as a string
-        string name;
-        ss >> name; // name = "*Jackal"
+    //STORE NAME-LEVEL
+        string name_level;
+        ss >> name_level; // name = "*Jackal"
         
         //if this creature is active
-        if(name[0] == '*')
+        if(name_level[0] == '*')
         {
             isActive = true;
             stringstream nameSS; //just to remove asterisk from name
-            nameSS << name;
+            nameSS << name_level;
             
             char asterisk;
             nameSS >> asterisk;
             
-            nameSS >> activeName;
-            partyNames[i] = activeName;
+            nameSS >> name_level;
+        }
+        
+    //STORE LEVEL & RENAME NAME
+        stringstream levelSS;
+        levelSS << name_level;
+        
+        string name = "";
+        int level;
+        char firstC; //takes first character
+        levelSS >> firstC;
+        name = firstC;
+        
+        //ONLY for C-lacanth (exception)
+        if(firstC == 'C')
+        {
+            name = "C-lacanth";
+            char skip;
+            levelSS >> skip; //skip out '-' after 'C'
+        }
+        else
+        {
+            char dash;
+            levelSS >> dash;
+            while(dash != '-') //skip characteres until reaches '-'
+            {
+                name += dash;
+                levelSS >> dash;
+            }
+            levelSS >> level; //parse out level#
         }
         partyNames[i] = name;
+        partyLevels[i] = level;
         
-        // pull the health
+    //STORE HEALTH
         int health;
         ss >> health; // health = 10
         partyHealths[i] = health;
@@ -180,10 +214,35 @@ string Trainer::makeMove(stringstream& situation) {
         //int maxHealth;
         //ss >> maxHealth; // maxHealth = 10
         
-        //if this creature is active
+    //STORE ATK, WEAK, & STR ELEMENTS
+        char c = name[0];
+        int typeNum = c - 'A';
+    //STORE ATTACK ELEMENT
+        string atkElement;
+        int atkElement_Num = CreatureType::TYPES[typeNum].getElementalAttackType();
+        atkElement = CreatureType::elementName(atkElement_Num, 0);
+        partyAtkElements[i] = atkElement;
+    
+    //STORE WEAK ELEMENT
+        string weakElement;
+        int weakElement_Num = CreatureType::TYPES[typeNum].getElementalWeakness();
+        weakElement = CreatureType::elementName(weakElement_Num, 0);
+        partyWeakElements[i] = weakElement;
+    
+    //STORE STRENGTH ELEMENT
+        string strElement;
+        int strElement_Num = CreatureType::TYPES[typeNum].getElementalStrength();
+        strElement = CreatureType::elementName(strElement_Num, 0);
+        partyStrElements[i] = strElement;
+        
+        
+    //if this creature is active
         if(isActive)
         {
+            activeName = name;
+            activeLevel = level;
             activeHealth = health;
+            activeAtkElement = atkElement;
             //activeMaxHealth = maxHealth;
             activeSlot = i;
         }
@@ -233,20 +292,17 @@ string Trainer::makeMove(stringstream& situation) {
     }
     
     
-    //testing only
+    // cout for testing only
     /*
-     for(int i = 1; i < PARTY_SIZE; i++)
-     {
-     cout << partyNames[i] << " gets damaged by " << partyDamages[i] << "\n";
-     }
+    for (int i = 1; i < PARTY_SIZE; i++)
+    {
+        cout << "\n";
+        cout << "Name: " << partyNames[i] << " | Health: " << partyHealths[i] << " | Level: " << partyLevels[i] << "\n";
+        cout << "AtkElement: " << partyAtkElements[i] << " | WeakElement: " << partyWeakElements[i] << " | StrElements: "<< partyStrElements[i] << "\n";
+        //cout << "Damaged by: " << partyDamages[i] << "\n";
+    }
      */
     
-    
-    //cout for testing
-    //for (int i = 1; i < PARTY_SIZE; i++)
-    //{
-    //    cout << "Name: " << partyNames[i] << " health: " << partyHealths[i] << "\n";
-    //}
     
     //cout for testing
     //cout << "Active: #" << activeNum << " " << activeName << " " << activeHealth << "/" << activeMaxHealth << "\n";
@@ -276,12 +332,7 @@ string Trainer::makeMove(stringstream& situation) {
     // to parse the input situation and create a proper response,
     // (like "a" for attack or "s3" to swap to the creature in slot 3).
     cout << situationString;
-    cout << isEndofBattle;
-    cout << isStartofBattle;
 
-
-    
-    
     /*
      * This line is basically what your AI chooses to do
      * When first playing, you may type in your move.

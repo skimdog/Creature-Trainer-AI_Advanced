@@ -48,6 +48,11 @@ private:
     
     string creatureParty[PARTY_SIZE];
     string partyNames[PARTY_SIZE];
+    int partyLevels[PARTY_SIZE];
+    string partyAtkElements[PARTY_SIZE];
+    string partyWeakElements[PARTY_SIZE];
+    string partyStrElements[PARTY_SIZE];
+    int partyAttacks[PARTY_SIZE];
     int partyHealths[PARTY_SIZE];
     int partyDamages[PARTY_SIZE]; //store for all four creatures, to be updated as battle goes on
     
