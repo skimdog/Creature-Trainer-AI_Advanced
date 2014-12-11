@@ -9,3 +9,39 @@
 //
 
 #include "Class2.h"
+#include <sstream>
+/*
+ParseHelp::ParseHelp()
+{
+    
+}
+
+void ParseHelp::parseNameAndLevel(string& name, int& level, string name_level)
+{
+    stringstream ss;
+    ss << name_level;
+    
+    char firstC; //takes first character
+    ss >> firstC;
+    name = firstC;
+    
+    //ONLY for C-lacanth (exception)
+    if(firstC == 'C')
+    {
+        char dash;
+        ss >> dash;
+        name += dash; //this '-' not be mistaken as the '-' before level#
+    }
+    else
+    {
+        char dash;
+        ss >> dash;
+        while(dash != '-') //skip characteres until reaches '-'
+        {
+            name += dash;
+            ss >> dash;
+        }
+        ss >> level; //parse out level#
+    }
+}
+*/
