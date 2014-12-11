@@ -23,6 +23,11 @@ class SwapOrAttack {
 public:
     static const int PARTY_SIZE = 5;
     
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
+     * Effects:  Default constructor
+     */
     SwapOrAttack();
     
     /**
@@ -59,17 +64,6 @@ private:
     int getHighestHealth(int partyHealths[]);
     
 };
-
-
-/**
- * Requires: Nothing.
- * Modifies: Nothing.
- * Effects:  runs a battle given the trainer, their party, the current
- situation, and the trainer's current win count
- */
-
-
-
 
 // ^^^^^^ And this line. That's it!
 

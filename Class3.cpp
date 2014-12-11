@@ -10,31 +10,54 @@
 
 #include "Class3.h"
 
-string CaptureCreature(int enemyBaseHealth, int enemyBaseAttack, int partyAttacks[], int partyHealths[]);
-/*int enemyUsefulness = enemyBaseHealth + enemyBaseAttack;
-for (i=0, i<=4, i++){
-    if enemyUsefulness > (partyAttacks[i]+partyHealths[i]){
- switch(swapSlot)
- {
- case 1:
- response = "s1";
- break;
- case 2:
- response = "s2";
- break;
- case 3:
- response = "s3";
- break;
- case 4:
- response = "s4";
- break;
- }
-
-    }
-}
-};*/
-
 // WE ARE GONNA CATCH  STUFF!!!!!!!!! YEAH!
 
+Capture::Capture()
+{
+    
+}
 
+int Capture::getLeastUseful(int partyHealths[], int partyAttacks[])
+{
+    int uselessSlot = 1;
+    int usefulness = partyHealths[1] + partyAttacks[1];
+    
+    for(int i = 2; i < PARTY_SIZE; i++)
+    {
+        if(usefulness > partyHealths[i] + partyAttacks[i])
+        {
+            usefulness = partyHealths[i] + partyAttacks[i];
+            uselessSlot = i;
+        }
+    }
+    return uselessSlot;
+}
 
+string Capture::captureCreature(int enemyBaseHealth, int enemyBaseAttack, int partyHealths[], int partyAttacks[])
+{
+    int enemyUsefulness = enemyBaseHealth + enemyBaseAttack;
+    int uselessSlot = getLeastUseful(partyHealths, partyAttacks);
+    int yourCreatureUsefulness = partyHealths[uselessSlot] + partyAttacks[uselessSlot];
+    
+    string response = ""; //default
+    
+    if (enemyUsefulness > yourCreatureUsefulness)
+    {
+        switch(uselessSlot)
+        {
+            case 1:
+                response = "co1";
+                break;
+            case 2:
+                response = "co2";
+                break;
+            case 3:
+                response = "co3";
+                break;
+            case 4:
+                response = "co4";
+                break;
+        }
+    }
+    return response;
+}

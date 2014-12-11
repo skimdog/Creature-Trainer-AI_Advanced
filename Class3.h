@@ -19,11 +19,33 @@ using namespace std;
 
 class Capture{
 public:
-    string CaptureCreature(int enemyBaseHealth, int enemyBaseAttack);
+    
+    static const int PARTY_SIZE = 5;
+    
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
+     * Effects:  Default constructor
+     */
+    Capture();
+    
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
+     * Effects:  Returns specific capture response (co1, co2,...) based on which party Creature is least useful
+     */
+    string captureCreature(int enemyBaseHealth, int enemyBaseAttack, int partyHealths[], int partyAttacks[]);
+    
+private:
+    
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
+     * Effects:  Returns slot of the least useful Creature in the party, based on sum of its health & attack
+     */
+    int getLeastUseful(int partyHealths[], int partyAttacks[]);
     
 };
-
-
 
 // ^^^^^^ And this line. That's it!
 
