@@ -14,7 +14,22 @@ string CaptureCreature(int enemyBaseHealth, int enemyBaseAttack, int partyAttack
 /*int enemyUsefulness = enemyBaseHealth + enemyBaseAttack;
 for (i=0, i<=4, i++){
     if enemyUsefulness > (partyAttacks[i]+partyHealths[i]){
-        return 's' i;
+ switch(swapSlot)
+ {
+ case 1:
+ response = "s1";
+ break;
+ case 2:
+ response = "s2";
+ break;
+ case 3:
+ response = "s3";
+ break;
+ case 4:
+ response = "s4";
+ break;
+ }
+
     }
 }
 };*/
