@@ -109,10 +109,9 @@ string Trainer::makeMove(stringstream& situation) {
         
         if (c1 == 'Y' && c2 == 'o' && c3 == 'u' && c4 == ' ' && (c5 == 'r' || c5 == 'd'))
         {
-            isEndofBattle = false;
+            isEndofBattle = true;
         }
     }
-    
     
     
     // * INITIALIZE creatureParty *
