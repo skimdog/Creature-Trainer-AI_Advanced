@@ -12,7 +12,12 @@
 #include <iostream>
 using namespace std;
 
-int Class1::getHighestHealth(int partyHealths[])
+SwapOrAttack::SwapOrAttack()
+{
+    
+}
+
+int SwapOrAttack::getHighestHealth(int partyHealths[])
 {
     int highestSlot = 1;
     int highestHealth = partyHealths[1];
@@ -27,7 +32,7 @@ int Class1::getHighestHealth(int partyHealths[])
     return highestSlot;
 }
 
-string Class1::swapToHighestHealth(int partyHealths[], int activeSlot)
+string SwapOrAttack::swapToHighestHealth(int partyHealths[], int activeSlot)
 {
     int swapSlot = getHighestHealth(partyHealths);
     string response;
@@ -59,7 +64,7 @@ string Class1::swapToHighestHealth(int partyHealths[], int activeSlot)
     return response;
 }
 
-bool Class1::isGonnaDie(int health, int enemyATK)
+bool SwapOrAttack::isGonnaDie(int health, int enemyATK)
 {
     if (health <= enemyATK)
     {
@@ -71,7 +76,7 @@ bool Class1::isGonnaDie(int health, int enemyATK)
     }
 }
 
-bool Class1::areOthersGonnaDie(int partyHealths[], int partyDamages[])
+bool SwapOrAttack::areOthersGonnaDie(int partyHealths[], int partyDamages[])
 {
     for(int i = 1; i < PARTY_SIZE; i++)
     {

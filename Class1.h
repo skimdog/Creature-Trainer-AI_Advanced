@@ -14,16 +14,16 @@
 
 #include <iostream>
 using namespace std;
-// vvvvvv Your implementations go between this line…
+// vvvvvv Your implementations go between this line
 
 //maybe "SwapOrAttack"?
 
 
-class Class1 {
+class SwapOrAttack {
 public:
     static const int PARTY_SIZE = 5;
     
-    
+    SwapOrAttack();
     
     /**
      * Requires: Nothing.

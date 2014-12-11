@@ -284,7 +284,7 @@ string Trainer::makeMove(stringstream& situation) {
     
     
     //THE DECISION BEGINS HERE!!!
-    Class1 class1;
+    SwapOrAttack swapOrAttack;
     
     string response;
     //cin >> response;
@@ -292,20 +292,20 @@ string Trainer::makeMove(stringstream& situation) {
     //every start of battle, swap
     if (isStartofBattle)
     {
-        response = class1.swapToHighestHealth(partyHealths, activeSlot);
+        response = swapOrAttack.swapToHighestHealth(partyHealths, activeSlot);
         return response;
     }
     
-    if (!class1.isGonnaDie(activeHealth, enemyATK))
+    if (!swapOrAttack.isGonnaDie(activeHealth, enemyATK))
     {
         response = 'a';
     }
     else
     {
-        response = class1.swapToHighestHealth(partyHealths, activeSlot);
+        response = swapOrAttack.swapToHighestHealth(partyHealths, activeSlot);
         
         //if next turn any one of other creatures will swap, thus making swapping to loop infinite!
-        if(class1.areOthersGonnaDie(partyHealths, partyDamages))
+        if(swapOrAttack.areOthersGonnaDie(partyHealths, partyDamages))
         {
             //just risk it!
             response = 'a';
@@ -314,7 +314,7 @@ string Trainer::makeMove(stringstream& situation) {
             if(activeHealth == 0)
             {
                 //send other to the front line anyway
-                response = class1.swapToHighestHealth(partyHealths, activeSlot);
+                response = swapOrAttack.swapToHighestHealth(partyHealths, activeSlot);
             }
         }
     }
