@@ -296,7 +296,7 @@ string Trainer::makeMove(stringstream& situation) {
     }
     if (isEndofBattle)
     {
-        //response..... 
+        //response.....
     }
     
     if (!swapOrAttack.isGonnaDie(activeHealth, enemyATK))
