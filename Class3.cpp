@@ -17,7 +17,7 @@ Capture::Capture()
     
 }
 
-int Capture::getLeastUseful(int partyHealths[], int partyAttacks[])
+int Capture::getLeastUsefulSlot(int partyHealths[], int partyAttacks[])
 {
     int uselessSlot = 1;
     int usefulness = partyHealths[1] + partyAttacks[1];
@@ -33,10 +33,10 @@ int Capture::getLeastUseful(int partyHealths[], int partyAttacks[])
     return uselessSlot;
 }
 
-string Capture::captureCreature(int enemyBaseHealth, int enemyBaseAttack, int partyHealths[], int partyAttacks[])
+string Capture::captureCreature(int enemyMaxHealth, int enemyAttack, int partyHealths[], int partyAttacks[])
 {
-    int enemyUsefulness = enemyBaseHealth + enemyBaseAttack;
-    int uselessSlot = getLeastUseful(partyHealths, partyAttacks);
+    int enemyUsefulness = enemyMaxHealth + enemyAttack;
+    int uselessSlot = getLeastUsefulSlot(partyHealths, partyAttacks);
     int yourCreatureUsefulness = partyHealths[uselessSlot] + partyAttacks[uselessSlot];
     
     string response = ""; //default

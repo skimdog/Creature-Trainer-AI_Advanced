@@ -34,7 +34,7 @@ public:
      * Modifies: Nothing.
      * Effects:  Returns specific capture response (co1, co2,...) based on which party Creature is least useful
      */
-    string captureCreature(int enemyBaseHealth, int enemyBaseAttack, int partyHealths[], int partyAttacks[]);
+    string captureCreature(int enemyMaxHealth, int enemyAttack, int partyHealths[], int partyAttacks[]);
     
 private:
     
@@ -43,7 +43,7 @@ private:
      * Modifies: Nothing.
      * Effects:  Returns slot of the least useful Creature in the party, based on sum of its health & attack
      */
-    int getLeastUseful(int partyHealths[], int partyAttacks[]);
+    int getLeastUsefulSlot(int partyHealths[], int partyAttacks[]);
     
 };
 
