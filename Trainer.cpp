@@ -257,9 +257,10 @@ string Trainer::makeMove(stringstream& situation) {
     // * STORE INFO ABOUT ENEMY*
     
     string enemyName = "";
-    int enemyLevel  = 0;
-    int enemyAttack = 0;
-    int enemyHealth = 0;
+    int enemyLevel      = 0;
+    int enemyAttack     = 0;
+    int enemyBaseAttack = 0;
+    int enemyHealth     = 0;
     string enemyAtkElement  = "";
     string enemyWeakElement = "";
     string enemyStrElement  = "";
@@ -348,11 +349,18 @@ string Trainer::makeMove(stringstream& situation) {
         enemyNameSS >> enemyLevel; //parse out level#
     }
 
+//STORE ENEMY ATTACK AT CURRENT LEVEL
+    char c = enemyName[0];
+    int enemyTypeNum = c - 'A';
     
-    //parseHelp.parseNameAndLevel(enemyName, enemyLevel, enemyName_Level);
+    enemyBaseAttack = CreatureType::TYPES[enemyTypeNum].getAttackBase();
+    enemyAttack = enemyBaseAttack + (CreatureType::TYPES[enemyTypeNum].getAttackPerLevel() * enemyLevel);
     
-    //testing
-    cout << "Enemy name: " << enemyName << " | level: " << enemyLevel << "\n";
+//STORE ENEMY ATK ELEMENT
+    
+//STORE ENEMY WEAK ELEMENT
+    
+//STORE ENEMY STR ELEMENT
     
     // cout for testing only
     
@@ -363,8 +371,6 @@ string Trainer::makeMove(stringstream& situation) {
         cout << "AtkElement: " << partyAtkElements[i] << " | WeakElement: " << partyWeakElements[i] << " | StrElements: "<< partyStrElements[i] << "\n";
         //cout << "Damaged by: " << partyDamages[i] << "\n";
     }
-    
-    
     
     //cout for testing
     //cout << "Active: #" << activeNum << " " << activeName << " " << activeHealth << "/" << activeMaxHealth << "\n";
@@ -407,7 +413,7 @@ string Trainer::makeMove(stringstream& situation) {
     //THE DECISION BEGINS HERE!!!
     SwapOrAttack swapOrAttack;
     
-    string response;
+    string response = "a";
     //cin >> response;
     
     //every start of battle, swap
@@ -417,14 +423,14 @@ string Trainer::makeMove(stringstream& situation) {
         response = swapOrAttack.swapToHighestHealth(partyHealths, activeSlot);
         return response;
     }
-    if (isEndofBattle)
+    else if (isEndofBattle)
     {
-        response = 'r';
+        response = "r";
         return response;
     }
     if (!swapOrAttack.isGonnaDie(activeHealth, enemyDamage))
     {
-        response = 'a';
+        response = "a";
     }
     else
     {
@@ -434,7 +440,7 @@ string Trainer::makeMove(stringstream& situation) {
         if(swapOrAttack.areOthersGonnaDie(partyHealths, partyDamages))
         {
             //just risk it!
-            response = 'a';
+            response = "a";
             
             //if active already fainted
             if(activeHealth == 0)
