@@ -94,6 +94,27 @@ string Trainer::makeMove(stringstream& situation) {
     //    four elements (and are skipping the empty ones.
     
     
+    // *DETERMINE IF BATTLE HAS ENDED*
+    string itemLine;
+    for (int i = 0; i < lines.size(); i++)
+    {
+        itemLine = lines[i];
+        
+        //Store characters
+        char c1 = itemLine[0];
+        char c2 = itemLine[1];
+        char c3 = itemLine[2];
+        char c4 = itemLine[3];
+        char c5 = itemLine[4];
+        
+        if (c1 == 'Y' && c2 == 'o' && c3 == 'u' && c4 == ' ' && (c5 == 'r' || c5 == 'd'))
+        {
+            isEndofBattle = false;
+        }
+    }
+    
+    
+    
     // * INITIALIZE creatureParty *
     //first element (0) is empty; the rest (1,2,3,4) are four slots for four party creatures
     //to make it easier to comprehend

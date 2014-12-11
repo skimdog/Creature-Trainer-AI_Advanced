@@ -52,6 +52,7 @@ private:
     int partyDamages[PARTY_SIZE]; //store for all four creatures, to be updated as battle goes on
     
     bool isStartofBattle; //true if new battle has started
+    bool isEndofBattle;
     
     
     
