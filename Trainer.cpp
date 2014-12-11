@@ -294,6 +294,10 @@ string Trainer::makeMove(stringstream& situation) {
         response = swapOrAttack.swapToHighestHealth(partyHealths, activeSlot);
         return response;
     }
+    if (isEndofBattle)
+    {
+        //response..... 
+    }
     
     if (!swapOrAttack.isGonnaDie(activeHealth, enemyATK))
     {
