@@ -109,15 +109,15 @@ string Trainer::makeMove(stringstream& situation) {
         char c2 = itemLine[2];
         char c3 = itemLine[3];
         char c4 = itemLine[4];
-        char c5 = itemLine[5];
         
         
-        if (c0 == 'Y' && c1 == 'o' && c2 == 'u' && c3 == ' ' && (c4 == 'r' || c5 == 'd'))
+        
+        if (c0 == 'Y' && c1 == 'o' && c2 == 'u' && c3 == ' ' && (c4 == 'r' || c4 == 'd'))
         {
             isEndofBattle = true;
         }
     }
-    cout << isEndofBattle;
+    
     
     // * INITIALIZE creatureParty *
     //first element (0) is empty; the rest (1,2,3,4) are four slots for four party creatures
@@ -276,6 +276,10 @@ string Trainer::makeMove(stringstream& situation) {
     // to parse the input situation and create a proper response,
     // (like "a" for attack or "s3" to swap to the creature in slot 3).
     cout << situationString;
+    cout << isEndofBattle;
+    cout << isStartofBattle;
+
+
     
     
     /*
@@ -294,6 +298,7 @@ string Trainer::makeMove(stringstream& situation) {
     //cin >> response;
     
     //every start of battle, swap
+   
     if (isStartofBattle)
     {
         response = swapOrAttack.swapToHighestHealth(partyHealths, activeSlot);
@@ -302,8 +307,8 @@ string Trainer::makeMove(stringstream& situation) {
     if (isEndofBattle)
     {
         response = 'r';
+        return response;
     }
-    
     if (!swapOrAttack.isGonnaDie(activeHealth, enemyATK))
     {
         response = 'a';
