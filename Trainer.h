@@ -59,8 +59,6 @@ private:
     bool isStartofBattle; //true if new battle has started
     bool isEndofBattle;
     
-    
-    
     // ^^^^^^ And this line. That's it!
     
 };

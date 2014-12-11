@@ -31,6 +31,8 @@ string Trainer::makeMove(stringstream& situation) {
     isStartofBattle = false; //default
     isEndofBattle = false; //default
     
+    //ParseHelp parseHelp; //make parsing easier!
+    
     // pull the entire string out of stringStream& situation
     string situationString = situation.str();
     // situationString now includes ALL of the lines that will be sent to cout
@@ -78,6 +80,7 @@ string Trainer::makeMove(stringstream& situation) {
         if (c1 == 'I' && c2 == 't' && c3 == '\'')
         {
             isStartofBattle = true;
+            break;
         }
     }
     
@@ -171,33 +174,36 @@ string Trainer::makeMove(stringstream& situation) {
         }
         
     //STORE LEVEL & RENAME NAME
-        stringstream levelSS;
-        levelSS << name_level;
-        
         string name = "";
-        int level;
+        int level = 0;
+        
+        stringstream nameSS;
+        nameSS << name_level;
+        
         char firstC; //takes first character
-        levelSS >> firstC;
+        nameSS >> firstC;
         name = firstC;
         
         //ONLY for C-lacanth (exception)
         if(firstC == 'C')
         {
-            name = "C-lacanth";
-            char skip;
-            levelSS >> skip; //skip out '-' after 'C'
+            char dash;
+            ss >> dash;
+            name += dash; //this '-' not be mistaken as the '-' before level#
         }
         else
         {
             char dash;
-            levelSS >> dash;
+            nameSS >> dash;
             while(dash != '-') //skip characteres until reaches '-'
             {
                 name += dash;
-                levelSS >> dash;
+                nameSS >> dash;
             }
-            levelSS >> level; //parse out level#
+            nameSS >> level; //parse out level#
         }
+        //parseHelp.parseNameAndLevel(name, level, name_level);
+        
         partyNames[i] = name;
         partyLevels[i] = level;
         
@@ -248,8 +254,17 @@ string Trainer::makeMove(stringstream& situation) {
         }
     }
     
-    // * STORE ENEMY ATTACK DAMAGE for active creature *
+    // * STORE INFO ABOUT ENEMY*
     
+    string enemyName = "";
+    int enemyLevel  = 0;
+    int enemyAttack = 0;
+    int enemyHealth = 0;
+    string enemyAtkElement  = "";
+    string enemyWeakElement = "";
+    string enemyStrElement  = "";
+    
+//[FIRST!] STORE ENEMY DAMAGE TO ACTIVE CREATURE
     string enemyAttackLine;
     stringstream enemySS;
     const int NUM_OF_SKIPS = 8; //number of words to skip before attack damage is read
@@ -269,7 +284,7 @@ string Trainer::makeMove(stringstream& situation) {
         }
     }
     enemySS << enemyAttackLine;
-    int enemyATK = 0;
+    int enemyDamage = 0;
     string skip;
     
     if(isStartofBattle)
@@ -286,14 +301,61 @@ string Trainer::makeMove(stringstream& situation) {
         {
             enemySS >> skip;
         }
-        enemySS >> enemyATK;
-        partyDamages[activeSlot] = enemyATK;
+        enemySS >> enemyDamage;
+        partyDamages[activeSlot] = enemyDamage;
         //cout << "Attack damage: " << enemyATK << "\n";
     }
+
     
+//STORE ENEMY NAME & LEVEL
+    string enemyName_Level = "";
+    if(isStartofBattle)
+    {
+        //"It's an enemy **** !"
+        vector<string> enemyNameLevelLine = splitString(newBattleLine, " ");
+        enemyName_Level = enemyNameLevelLine[3];
+    }
+    else if(!isEndofBattle) //during battle
+    {
+        //"Enemy **** attacks..."
+        vector<string> enemyNameLevelLine = splitString(enemyAttackLine, " ");
+        enemyName_Level = enemyNameLevelLine[1];
+    }
+    
+    stringstream enemyNameSS;
+    enemyNameSS << enemyName_Level;
+    
+    char firstC; //takes first character
+    enemyNameSS >> firstC;
+    enemyName = firstC;
+    
+    //ONLY for C-lacanth (exception)
+    if(firstC == 'C')
+    {
+        char dash;
+        enemyNameSS >> dash;
+        enemyName += dash; //this '-' not be mistaken as the '-' before level#
+    }
+    else
+    {
+        char dash;
+        enemyNameSS >> dash;
+        while(dash != '-') //skip characteres until reaches '-'
+        {
+            enemyName += dash;
+            enemyNameSS >> dash;
+        }
+        enemyNameSS >> enemyLevel; //parse out level#
+    }
+
+    
+    //parseHelp.parseNameAndLevel(enemyName, enemyLevel, enemyName_Level);
+    
+    //testing
+    cout << "Enemy name: " << enemyName << " | level: " << enemyLevel << "\n";
     
     // cout for testing only
-    /*
+    
     for (int i = 1; i < PARTY_SIZE; i++)
     {
         cout << "\n";
@@ -301,7 +363,7 @@ string Trainer::makeMove(stringstream& situation) {
         cout << "AtkElement: " << partyAtkElements[i] << " | WeakElement: " << partyWeakElements[i] << " | StrElements: "<< partyStrElements[i] << "\n";
         //cout << "Damaged by: " << partyDamages[i] << "\n";
     }
-     */
+    
     
     
     //cout for testing
@@ -360,7 +422,7 @@ string Trainer::makeMove(stringstream& situation) {
         response = 'r';
         return response;
     }
-    if (!swapOrAttack.isGonnaDie(activeHealth, enemyATK))
+    if (!swapOrAttack.isGonnaDie(activeHealth, enemyDamage))
     {
         response = 'a';
     }
