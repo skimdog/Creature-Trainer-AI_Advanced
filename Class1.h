@@ -33,9 +33,23 @@ public:
     /**
      * Requires: Nothing.
      * Modifies: Nothing.
-     * Effects:  Returns swap command based on which creature has highest health
+     * Effects:  Swaps to creature with highest current health
      */
     string swapToHighestHealth(int partyHealths[], int activeSlot);
+    
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
+     * Effects: Swaps to creature with strength element equal to enemy's attack element
+     */
+    string swapToStrElement(string enemyAtkElement, string partyStrElements[]);
+    
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
+     * Effects:  Swaps to creature with attack element equal to enemy's weakness
+     */
+    string swapToAtkElement(string enemyWeakElement, string partyAtkElements[]);
     
     /**
      * Requires: Nothing.
