@@ -27,6 +27,7 @@ using namespace std;
 string Trainer::makeMove(stringstream& situation) {
     
     isStartofBattle = false; //default
+    isEndofBattle = false; //default
     
     // pull the entire string out of stringStream& situation
     string situationString = situation.str();
@@ -95,24 +96,28 @@ string Trainer::makeMove(stringstream& situation) {
     
     
     // *DETERMINE IF BATTLE HAS ENDED*
+    
     string itemLine;
+    
     for (int i = 0; i < lines.size(); i++)
     {
         itemLine = lines[i];
         
         //Store characters
-        char c1 = itemLine[0];
-        char c2 = itemLine[1];
-        char c3 = itemLine[2];
-        char c4 = itemLine[3];
-        char c5 = itemLine[4];
+        char c0 = itemLine[0];
+        char c1 = itemLine[1];
+        char c2 = itemLine[2];
+        char c3 = itemLine[3];
+        char c4 = itemLine[4];
+        char c5 = itemLine[5];
         
-        if (c1 == 'Y' && c2 == 'o' && c3 == 'u' && c4 == ' ' && (c5 == 'r' || c5 == 'd'))
+        
+        if (c0 == 'Y' && c1 == 'o' && c2 == 'u' && c3 == ' ' && (c4 == 'r' || c5 == 'd'))
         {
             isEndofBattle = true;
         }
     }
-    
+    cout << isEndofBattle;
     
     // * INITIALIZE creatureParty *
     //first element (0) is empty; the rest (1,2,3,4) are four slots for four party creatures
@@ -296,7 +301,7 @@ string Trainer::makeMove(stringstream& situation) {
     }
     if (isEndofBattle)
     {
-        //response.....
+        response = 'r';
     }
     
     if (!swapOrAttack.isGonnaDie(activeHealth, enemyATK))
