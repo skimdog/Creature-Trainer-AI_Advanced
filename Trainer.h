@@ -44,7 +44,7 @@ public:
 private:
     // vvvvvv Your changes to Trainer.h go between this line…
     
-    static const int PARTY_SIZE = 5;
+    const static int PARTY_SIZE = 5;
     
     string creatureParty[PARTY_SIZE];
     string partyNames[PARTY_SIZE];

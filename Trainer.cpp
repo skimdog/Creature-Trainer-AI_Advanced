@@ -436,8 +436,12 @@ string Trainer::makeMove(stringstream& situation) {
     {
         response = swapOrAttack.swapToHighestHealth(partyHealths, activeSlot);
         
+        if(swapOrAttack.isLastCreatureStanding(partyHealths, activeSlot))
+        {
+            response = "a";
+        }
         //if next turn any one of other creatures will swap, thus making swapping to loop infinite!
-        if(swapOrAttack.areOthersGonnaDie(partyHealths, partyDamages))
+        else if(swapOrAttack.areOthersGonnaDie(partyHealths, partyDamages))
         {
             //just risk it!
             response = "a";
