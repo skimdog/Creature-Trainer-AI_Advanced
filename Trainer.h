@@ -45,6 +45,8 @@ private:
     // vvvvvv Your changes to Trainer.h go between this line…
     
     const static int PARTY_SIZE = 5;
+    const static int ITEM_LIST_SIZE = 5;
+    const static int SCROLL_LIST_SIZE = 8;
     
     string creatureParty[PARTY_SIZE];
     string partyNames[PARTY_SIZE];
@@ -58,6 +60,10 @@ private:
     
     bool isStartofBattle; //true if new battle has started
     bool isEndofBattle;
+    
+    int itemList[ITEM_LIST_SIZE];
+    int scrollList[SCROLL_LIST_SIZE];
+    
     
     // ^^^^^^ And this line. That's it!
     

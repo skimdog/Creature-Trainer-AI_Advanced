@@ -100,7 +100,7 @@ string Trainer::makeMove(stringstream& situation) {
     //    four elements (and are skipping the empty ones.
     
     
-    // *DETERMINE IF BATTLE HAS ENDED*
+// *DETERMINE IF BATTLE HAS ENDED*
     
     string battleEndLine;
     
@@ -133,7 +133,7 @@ string Trainer::makeMove(stringstream& situation) {
         creatureParty[j] = creatureHealthBits[j];
     }
     
-    //* STORING NAMES, LEVELS, ATTACK ELEMENTS, CURRENT ATTACKS, & CURRENT HEALTHS in arrays *
+//* STORING NAMES, LEVELS, ATTACK ELEMENTS, CURRENT ATTACKS, & CURRENT HEALTHS in arrays *
     
     //STORE INFO ABOUT ACTIVE CREATURE
     bool isActive; //true when name starts with '*'
@@ -262,7 +262,7 @@ string Trainer::makeMove(stringstream& situation) {
         }
     }
     
-    // * STORE INFO ABOUT ENEMY*
+// * STORE INFO ABOUT ENEMY*
     
     string enemyName = "";
     int enemyLevel      = 0;
@@ -385,7 +385,8 @@ string Trainer::makeMove(stringstream& situation) {
     enemyStrElement = CreatureType::elementName(strElement_Num, 0);
 
 
-    //* STORE COUNTS FOR ALL ITEMS
+//* STORE COUNTS FOR ALL ITEMS *
+    
     string itemLine;
     string scrollLine;
     
@@ -401,7 +402,48 @@ string Trainer::makeMove(stringstream& situation) {
         }
     }
     
+    //parsing in first line of items
+    vector<string> itemLineList = splitString(itemLine, "!");
+    const int LIST_SIZE = 7;
     
+    for(int i = 1; i < LIST_SIZE - 1; i++)
+    {
+        stringstream itemSS;
+        itemSS << itemLineList[i];
+        
+        char colon;
+        itemSS >> colon;
+        while(colon != ':') //skip characters until reaches ':'
+        {
+            itemSS >> colon;
+        }
+        itemSS >> itemList[i - 1]; //# of certain item
+        
+        //testing
+        //cout << "Item #" << i << ": " << itemList[i - 1] << "\n";
+    }
+    
+    //parsing in second line of scrolls
+    vector<string> scrollLineList = splitString(scrollLine, "!");
+    const int SCROLL_SIZE = 11;
+    
+    for(int i = 2; i < SCROLL_SIZE - 1; i++)
+    {
+        stringstream scrollSS;
+        scrollSS << scrollLineList[i];
+        
+        char colon;
+        scrollSS >> colon;
+        while(colon != ':') //skip characters until reaches ':'
+        {
+            scrollSS >> colon;
+        }
+        scrollSS >> scrollList[i - 2]; //# of scrolls
+        
+        //testing
+        //cout << "Scroll #" << i << ": " << scrollList[i - 2] << "\n";
+    }
+
     
     //testing
     /*
@@ -487,8 +529,10 @@ string Trainer::makeMove(stringstream& situation) {
          else use defboost
          */;
         response = "r";
-        capture.captureCreature(enemyMaxHealth, enemyAttack, partyHealths, partyAttacks, response);
-        
+        if(itemList[4] > 0)
+        {
+            capture.captureCreature(enemyMaxHealth, enemyAttack, partyHealths, partyAttacks, response);
+        }
         return response;
     }
     if (!swapOrAttack.isGonnaDie(activeHealth, enemyDamage))
