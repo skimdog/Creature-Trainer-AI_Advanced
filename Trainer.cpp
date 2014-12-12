@@ -471,7 +471,11 @@ string Trainer::makeMove(stringstream& situation) {
             if enemy usefulness > dead pokemon usefulness
                 then capture
                 else revive dead pokemon
-         else potion
+         elseif active health less than 1/2
+            then use potion
+         elseif number of atkboosts > number of defboots
+            then use atkboost
+         else use defboost
          */;
         
         return response;
