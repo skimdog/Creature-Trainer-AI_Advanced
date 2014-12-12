@@ -465,7 +465,15 @@ string Trainer::makeMove(stringstream& situation) {
     }
     else if (isEndofBattle)
     {
-        response = "r";
+        /* END BATTLE LOGIC
+         default = ??
+         if we have a dead thing
+            if enemy usefulness > dead pokemon usefulness
+                then capture
+                else revive dead pokemon
+         else potion
+         */;
+        
         return response;
     }
     if (!swapOrAttack.isGonnaDie(activeHealth, enemyDamage))
