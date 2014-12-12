@@ -90,6 +90,16 @@ public:
      */
     bool isFainted(int slot, int partyHealths[]);
     
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
+     * Effects:  Revives any fainted creature in party.
+                 If more than one, revives the most useful one.
+     */
+    void reviveMostUsefulCreature(int partyHealths[], int partyAttacks[], string& response);
+    
+    void useScroll(int scrollPos, string& response);
+    
 private:
     
     /**

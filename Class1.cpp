@@ -70,10 +70,7 @@ bool SwapOrAttack::isGonnaDie(int health, int enemyATK)
     {
         return true;
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 
 bool SwapOrAttack::areOthersGonnaDie(int partyHealths[], int partyDamages[])
@@ -92,13 +89,87 @@ bool SwapOrAttack::areOthersGonnaDie(int partyHealths[], int partyDamages[])
 
 bool SwapOrAttack::isLastCreatureStanding(int partyHealths[], int activeSlot)
 {
-    for(int i = 0; i < PARTY_SIZE; i++)
+    for(int i = 1; i < PARTY_SIZE; i++)
     {
-        if(i != activeSlot && partyHealths[i] > 0)
+        if(i != activeSlot && !isFainted(i, partyHealths))
         {
             return false;
         }
     }
     return true;
+}
+
+bool SwapOrAttack::isFainted(int slot, int partyHealths[])
+{
+    if(partyHealths[slot] == 0)
+    {
+        return true;
+    }
+    return false;
+}
+
+void SwapOrAttack::reviveMostUsefulCreature(int partyHealths[], int partyAttacks[], string& response)
+{
+    int usefulSlot = 0;
+    int mostUsefulness = 0;
+    if(isFainted(1, partyHealths))
+    {
+        mostUsefulness = partyHealths[1] + partyAttacks[1]; //default
+        usefulSlot = 1;
+    }
+    for(int i = 2; i < PARTY_SIZE; i++)
+    {
+        if(isFainted(i, partyHealths) && mostUsefulness < partyHealths[i] + partyAttacks[i])
+        {
+            mostUsefulness = partyHealths[i] + partyAttacks[i];
+            usefulSlot = i;
+        }
+    }
+    switch(usefulSlot)
+    {
+        case 1:
+            response = "re1";
+            break;
+        case 2:
+            response = "re2";
+            break;
+        case 3:
+            response = "re3";
+            break;
+        case 4:
+            response = "re4";
+            break;
+    }
+}
+
+void SwapOrAttack::useScroll(int scrollPos, string& response)
+{
+    switch(scrollPos)
+    {
+        case 0:
+            response = "sa";
+            break;
+        case 1:
+            response = "sb";
+            break;
+        case 2:
+            response = "sc";
+            break;
+        case 3:
+            response = "sd";
+            break;
+        case 4:
+            response = "se";
+            break;
+        case 5:
+            response = "sf";
+            break;
+        case 6:
+            response = "sg";
+            break;
+        case 7:
+            response = "sh";
+            break;
+    }
 }
 

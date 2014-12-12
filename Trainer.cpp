@@ -114,10 +114,10 @@ string Trainer::makeMove(stringstream& situation) {
         char c2 = battleEndLine[2];
         char c3 = battleEndLine[3];
         char c4 = battleEndLine[4];
+        char c5 = battleEndLine[5];
+        char c6 = battleEndLine[6];
         
-        
-        
-        if (c0 == 'Y' && c1 == 'o' && c2 == 'u' && c3 == ' ' && (c4 == 'r' || c4 == 'd'))
+        if (c0 == 'Y' && c1 == 'o' && c2 == 'u' && c3 == ' ' && ((c4 == 'r' && c5 == 'e' && c6 == 'c') || c4 == 'd'))
         {
             isEndofBattle = true;
         }
@@ -257,6 +257,8 @@ string Trainer::makeMove(stringstream& situation) {
             activeHealth = health;
             activeAttack = attack;
             activeAtkElement = atkElement;
+            activeWeakElement = weakElement;
+            activeStrElement = strElement;
             //activeMaxHealth = maxHealth;
             activeSlot = i;
         }
@@ -517,33 +519,7 @@ string Trainer::makeMove(stringstream& situation) {
         int scrollPos = CreatureType::TYPES[enemyTypeNum].getElementalWeakness();
         if(scrollList[scrollPos] > 0)
         {
-            switch(scrollPos)
-            {
-                case 0:
-                    response = "sa";
-                    break;
-                case 1:
-                    response = "sb";
-                    break;
-                case 2:
-                    response = "sc";
-                    break;
-                case 3:
-                    response = "sd";
-                    break;
-                case 4:
-                    response = "se";
-                    break;
-                case 5:
-                    response = "sf";
-                    break;
-                case 6:
-                    response = "sg";
-                    break;
-                case 7:
-                    response = "sh";
-                    break;
-            }
+            swapOrAttack.useScroll(scrollPos, response);
         }
         return response;
     }
@@ -575,7 +551,7 @@ string Trainer::makeMove(stringstream& situation) {
             }
         }
         
-        if(activeHealth < 1/2)
+        if(activeHealth <= 10)
         {
             response = "r";
             if(itemList[0] > 0) //potion
@@ -583,6 +559,12 @@ string Trainer::makeMove(stringstream& situation) {
                 response = "po";
             }
         }
+        
+        if(itemList[3] > 0)
+        {
+            swapOrAttack.reviveMostUsefulCreature(partyHealths, partyAttacks, response);
+        }
+        
         if(itemList[4] > 0) //collar
         {
             capture.captureCreature(enemyMaxHealth, enemyAttack, partyHealths, partyAttacks, response);
@@ -592,6 +574,12 @@ string Trainer::makeMove(stringstream& situation) {
     if (!swapOrAttack.isGonnaDie(activeHealth, enemyDamage))
     {
         response = "a";
+        
+        int scrollPos = CreatureType::TYPES[enemyTypeNum].getElementalWeakness();
+        if(scrollList[scrollPos] > 0)
+        {
+            swapOrAttack.useScroll(scrollPos, response);
+        }
     }
     else
     {
@@ -600,6 +588,11 @@ string Trainer::makeMove(stringstream& situation) {
         if(swapOrAttack.isLastCreatureStanding(partyHealths, activeSlot))
         {
             response = "a";
+            
+            if(itemList[3] > 0)
+            {
+                swapOrAttack.reviveMostUsefulCreature(partyHealths, partyAttacks, response);
+            }
         }
         //if next turn any one of other creatures will swap, thus making swapping to loop infinite!
         else if(swapOrAttack.areOthersGonnaDie(partyHealths, partyDamages))
