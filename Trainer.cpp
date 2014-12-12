@@ -491,6 +491,13 @@ string Trainer::makeMove(stringstream& situation) {
         //if next turn any one of other creatures will swap, thus making swapping to loop infinite!
         else if(swapOrAttack.areOthersGonnaDie(partyHealths, partyDamages))
         {
+            /*
+             SCROLL USAGE IN CLUTCH SITUATIONS
+             if infinite switching loop
+                if we have scroll for enemy weakness
+                    then use scroll(enemyWeakness)
+                    else response = 'a'
+             */
             //just risk it!
             response = "a";
             
