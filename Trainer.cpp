@@ -102,18 +102,18 @@ string Trainer::makeMove(stringstream& situation) {
     
     // *DETERMINE IF BATTLE HAS ENDED*
     
-    string itemLine;
+    string battleEndLine;
     
     for (int i = 0; i < lines.size(); i++)
     {
-        itemLine = lines[i];
+        battleEndLine = lines[i];
         
         //Store characters
-        char c0 = itemLine[0];
-        char c1 = itemLine[1];
-        char c2 = itemLine[2];
-        char c3 = itemLine[3];
-        char c4 = itemLine[4];
+        char c0 = battleEndLine[0];
+        char c1 = battleEndLine[1];
+        char c2 = battleEndLine[2];
+        char c3 = battleEndLine[3];
+        char c4 = battleEndLine[4];
         
         
         
@@ -156,7 +156,7 @@ string Trainer::makeMove(stringstream& situation) {
         stringstream ss;
         ss << creatureParty[i];
         
-    //STORE NAME-LEVEL
+        //STORE NAME-LEVEL
         string name_level;
         ss >> name_level; // name = "*Jackal"
         
@@ -173,7 +173,7 @@ string Trainer::makeMove(stringstream& situation) {
             nameSS >> name_level;
         }
         
-    //STORE LEVEL & RENAME NAME
+        //STORE LEVEL & RENAME NAME
         string name = "";
         int level = 0;
         
@@ -207,7 +207,7 @@ string Trainer::makeMove(stringstream& situation) {
         partyNames[i] = name;
         partyLevels[i] = level;
         
-    //STORE HEALTH
+        //STORE HEALTH
         int health;
         ss >> health; // health = 10
         partyHealths[i] = health;
@@ -220,29 +220,29 @@ string Trainer::makeMove(stringstream& situation) {
         //int maxHealth;
         //ss >> maxHealth; // maxHealth = 10
         
-    //STORE ATK, WEAK, & STR ELEMENTS
+        //STORE ATK, WEAK, & STR ELEMENTS
         char c = name[0];
         int typeNum = c - 'A';
-    //STORE ATTACK ELEMENT
+        //STORE ATTACK ELEMENT
         string atkElement;
         int atkElement_Num = CreatureType::TYPES[typeNum].getElementalAttackType();
         atkElement = CreatureType::elementName(atkElement_Num, 0);
         partyAtkElements[i] = atkElement;
     
-    //STORE WEAK ELEMENT
+        //STORE WEAK ELEMENT
         string weakElement;
         int weakElement_Num = CreatureType::TYPES[typeNum].getElementalWeakness();
         weakElement = CreatureType::elementName(weakElement_Num, 0);
         partyWeakElements[i] = weakElement;
     
-    //STORE STRENGTH ELEMENT
+        //STORE STRENGTH ELEMENT
         string strElement;
         int strElement_Num = CreatureType::TYPES[typeNum].getElementalStrength();
         strElement = CreatureType::elementName(strElement_Num, 0);
         partyStrElements[i] = strElement;
         
         
-    //if this creature is active
+        //if this creature is active
         if(isActive)
         {
             activeName = name;
@@ -266,7 +266,7 @@ string Trainer::makeMove(stringstream& situation) {
     string enemyWeakElement = "";
     string enemyStrElement  = "";
     
-//[FIRST!] STORE ENEMY DAMAGE TO ACTIVE CREATURE
+    //[FIRST!] STORE ENEMY DAMAGE TO ACTIVE CREATURE
     string enemyAttackLine;
     stringstream enemySS;
     const int NUM_OF_SKIPS = 8; //number of words to skip before attack damage is read
@@ -309,7 +309,7 @@ string Trainer::makeMove(stringstream& situation) {
     }
 
     
-//STORE ENEMY NAME & LEVEL
+    //STORE ENEMY NAME & LEVEL
     string enemyName_Level = "";
     if(isStartofBattle)
     {
@@ -350,32 +350,50 @@ string Trainer::makeMove(stringstream& situation) {
         enemyNameSS >> enemyLevel; //parse out level#
     }
 
-//STORE ENEMY ATTACK AT CURRENT LEVEL
+    //STORE ENEMY ATTACK AT CURRENT LEVEL
     char c = enemyName[0];
     int enemyTypeNum = c - 'A';
     
     enemyBaseAttack = CreatureType::TYPES[enemyTypeNum].getAttackBase();
     enemyAttack = enemyBaseAttack + (CreatureType::TYPES[enemyTypeNum].getAttackPerLevel() * enemyLevel);
     
-//STORE ENEMY MAX HEALTH
+    //STORE ENEMY MAX HEALTH
     enemyMaxHealthBase = CreatureType::TYPES[enemyTypeNum].getHealthMaxBase();
     enemyMaxHealth = enemyMaxHealthBase + (CreatureType::TYPES[enemyTypeNum].getHealthMaxPerLevel() * enemyLevel);
 
     
-//STORE ENEMY ATK ELEMENT
+    //STORE ENEMY ATK ELEMENT
     int atkElement_Num = CreatureType::TYPES[enemyTypeNum].getElementalAttackType();
     enemyAtkElement = CreatureType::elementName(atkElement_Num, 0);
 
     
-//STORE ENEMY WEAK ELEMENT
+    //STORE ENEMY WEAK ELEMENT
     int weakElement_Num = CreatureType::TYPES[enemyTypeNum].getElementalWeakness();
     enemyWeakElement = CreatureType::elementName(weakElement_Num, 0);
 
     
-//STORE ENEMY STR ELEMENT
+    //STORE ENEMY STR ELEMENT
     int strElement_Num = CreatureType::TYPES[enemyTypeNum].getElementalStrength();
     enemyStrElement = CreatureType::elementName(strElement_Num, 0);
 
+
+    //* STORE COUNTS FOR ALL ITEMS
+    string itemLine;
+    string scrollLine;
+    
+    for (int i = 0; i < lines.size(); i++)
+    {
+        itemLine = lines[i];
+        
+        char exclamPoint = itemLine[0];
+        if(exclamPoint == '!')
+        {
+            scrollLine = lines[i + 1];
+            break;
+        }
+    }
+    
+    
     
     //testing
     /*
