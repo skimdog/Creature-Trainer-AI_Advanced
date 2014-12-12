@@ -512,6 +512,39 @@ string Trainer::makeMove(stringstream& situation) {
     if (isStartofBattle)
     {
         response = swapOrAttack.swapToHighestHealth(partyHealths, activeSlot);
+        
+        //use scroll if possible
+        int scrollPos = CreatureType::TYPES[enemyTypeNum].getElementalWeakness();
+        if(scrollList[scrollPos] > 0)
+        {
+            switch(scrollPos)
+            {
+                case 0:
+                    response = "sa";
+                    break;
+                case 1:
+                    response = "sb";
+                    break;
+                case 2:
+                    response = "sc";
+                    break;
+                case 3:
+                    response = "sd";
+                    break;
+                case 4:
+                    response = "se";
+                    break;
+                case 5:
+                    response = "sf";
+                    break;
+                case 6:
+                    response = "sg";
+                    break;
+                case 7:
+                    response = "sh";
+                    break;
+            }
+        }
         return response;
     }
     else if (isEndofBattle)
@@ -529,7 +562,28 @@ string Trainer::makeMove(stringstream& situation) {
          else use defboost
          */;
         response = "r";
-        if(itemList[4] > 0)
+        
+        if(itemList[1] > 0 || itemList[2] > 0) //defBst/atkBst
+        {
+            if(itemList[2] > itemList[1]) //atkBst > defBst
+            {
+                response = "ab";
+            }
+            else
+            {
+                response = "db";
+            }
+        }
+        
+        if(activeHealth < 1/2)
+        {
+            response = "r";
+            if(itemList[0] > 0) //potion
+            {
+                response = "po";
+            }
+        }
+        if(itemList[4] > 0) //collar
         {
             capture.captureCreature(enemyMaxHealth, enemyAttack, partyHealths, partyAttacks, response);
         }
