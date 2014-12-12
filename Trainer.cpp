@@ -260,7 +260,8 @@ string Trainer::makeMove(stringstream& situation) {
     int enemyLevel      = 0;
     int enemyAttack     = 0;
     int enemyBaseAttack = 0;
-    int enemyHealth     = 0;
+    int enemyMaxHealth  = 0;
+    int enemyMaxHealthBase  = 0;
     string enemyAtkElement  = "";
     string enemyWeakElement = "";
     string enemyStrElement  = "";
@@ -356,14 +357,35 @@ string Trainer::makeMove(stringstream& situation) {
     enemyBaseAttack = CreatureType::TYPES[enemyTypeNum].getAttackBase();
     enemyAttack = enemyBaseAttack + (CreatureType::TYPES[enemyTypeNum].getAttackPerLevel() * enemyLevel);
     
+//STORE ENEMY MAX HEALTH
+    enemyMaxHealthBase = CreatureType::TYPES[enemyTypeNum].getHealthMaxBase();
+    enemyMaxHealth = enemyMaxHealthBase + (CreatureType::TYPES[enemyTypeNum].getHealthMaxPerLevel() * enemyLevel);
+
+    
 //STORE ENEMY ATK ELEMENT
+    int atkElement_Num = CreatureType::TYPES[enemyTypeNum].getElementalAttackType();
+    enemyAtkElement = CreatureType::elementName(atkElement_Num, 0);
+
     
 //STORE ENEMY WEAK ELEMENT
+    int weakElement_Num = CreatureType::TYPES[enemyTypeNum].getElementalWeakness();
+    enemyWeakElement = CreatureType::elementName(weakElement_Num, 0);
+
     
 //STORE ENEMY STR ELEMENT
+    int strElement_Num = CreatureType::TYPES[enemyTypeNum].getElementalStrength();
+    enemyStrElement = CreatureType::elementName(strElement_Num, 0);
+
+    
+    //testing
+    /*
+    cout << "\n";
+    cout << "Enemy name: " << enemyName << " | Health: " << enemyMaxHealth << " | Level: " << enemyLevel << "\n";
+    cout << "AtkElement: " << enemyAtkElement << " | WeakElement: " << enemyWeakElement << " | StrElements: "<< enemyStrElement << "\n";
+     */
     
     // cout for testing only
-    
+    /*
     for (int i = 1; i < PARTY_SIZE; i++)
     {
         cout << "\n";
@@ -371,7 +393,7 @@ string Trainer::makeMove(stringstream& situation) {
         cout << "AtkElement: " << partyAtkElements[i] << " | WeakElement: " << partyWeakElements[i] << " | StrElements: "<< partyStrElements[i] << "\n";
         //cout << "Damaged by: " << partyDamages[i] << "\n";
     }
-    
+    */
     //cout for testing
     //cout << "Active: #" << activeNum << " " << activeName << " " << activeHealth << "/" << activeMaxHealth << "\n";
     
