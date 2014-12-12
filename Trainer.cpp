@@ -140,6 +140,7 @@ string Trainer::makeMove(stringstream& situation) {
     string activeName = "";
     int activeLevel  = 0;
     int activeHealth = 0;
+    int activeAttack = 0;
     string activeAtkElement  = "";
     string activeWeakElement = "";
     string activeStrElement  = "";
@@ -242,12 +243,19 @@ string Trainer::makeMove(stringstream& situation) {
         partyStrElements[i] = strElement;
         
         
+        //STORE ATTACK AT CURRENT LEVEL
+        int attack;
+        int attackBase = CreatureType::TYPES[typeNum].getAttackBase();
+        attack = attackBase + (CreatureType::TYPES[typeNum].getAttackPerLevel() * level);
+        partyAttacks[i] = attack;
+        
         //if this creature is active
         if(isActive)
         {
             activeName = name;
             activeLevel = level;
             activeHealth = health;
+            activeAttack = attack;
             activeAtkElement = atkElement;
             //activeMaxHealth = maxHealth;
             activeSlot = i;
@@ -452,6 +460,7 @@ string Trainer::makeMove(stringstream& situation) {
     
     //THE DECISION BEGINS HERE!!!
     SwapOrAttack swapOrAttack;
+    Capture capture;
     
     string response = "a";
     //cin >> response;
@@ -477,6 +486,8 @@ string Trainer::makeMove(stringstream& situation) {
             then use atkboost
          else use defboost
          */;
+        response = "r";
+        capture.captureCreature(enemyMaxHealth, enemyAttack, partyHealths, partyAttacks, response);
         
         return response;
     }

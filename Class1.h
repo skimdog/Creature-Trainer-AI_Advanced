@@ -88,7 +88,7 @@ public:
      * Modifies: Nothing.
      * Effects:  Returns true if creature at specific slot is fainted
      */
-    bool isFainted(int slot);
+    bool isFainted(int slot, int partyHealths[]);
     
 private:
     

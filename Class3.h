@@ -34,7 +34,7 @@ public:
      * Modifies: Nothing.
      * Effects:  Returns specific capture response (co1, co2,...) based on which party Creature is least useful
      */
-    string captureCreature(int enemyMaxHealth, int enemyAttack, int partyHealths[], int partyAttacks[]);
+    void captureCreature(int enemyMaxHealth, int enemyAttack, int partyHealths[], int partyAttacks[], string& response);
     
 private:
     
