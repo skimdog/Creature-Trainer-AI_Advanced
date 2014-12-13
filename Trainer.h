@@ -64,7 +64,6 @@ private:
     int itemList[ITEM_LIST_SIZE];
     int scrollList[SCROLL_LIST_SIZE];
     
-    
     // ^^^^^^ And this line. That's it!
     
 };

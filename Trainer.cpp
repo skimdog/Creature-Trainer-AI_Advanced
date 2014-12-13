@@ -276,10 +276,10 @@ string Trainer::makeMove(stringstream& situation) {
     string enemyWeakElement = "";
     string enemyStrElement  = "";
     
-    //[FIRST!] STORE ENEMY DAMAGE TO ACTIVE CREATURE
+    //FIND LINE WITH "ENEMY"
     string enemyAttackLine;
     stringstream enemySS;
-    const int NUM_OF_SKIPS = 8; //number of words to skip before attack damage is read
+    //const int NUM_OF_SKIPS = 8; //number of words to skip before attack damage is read
     
     for (int i = 0; i < lines.size(); i++)
     {
@@ -296,7 +296,10 @@ string Trainer::makeMove(stringstream& situation) {
         }
     }
     enemySS << enemyAttackLine;
-    int enemyDamage = 0;
+    
+    //may not use this at all
+    
+    /*int enemyDamage = 0;
     string skip;
     
     if(isStartofBattle)
@@ -316,7 +319,7 @@ string Trainer::makeMove(stringstream& situation) {
         enemySS >> enemyDamage;
         partyDamages[activeSlot] = enemyDamage;
         //cout << "Attack damage: " << enemyATK << "\n";
-    }
+    }*/
 
     
     //STORE ENEMY NAME & LEVEL
@@ -513,7 +516,7 @@ string Trainer::makeMove(stringstream& situation) {
    
     if (isStartofBattle)
     {
-        response = swapOrAttack.swapToHighestHealth(partyHealths, activeSlot);
+        swapOrAttack.swapToHighestHealth(partyHealths, activeSlot, response);
         
         //you can remove this if you want
         //use scroll if possible
@@ -580,7 +583,7 @@ string Trainer::makeMove(stringstream& situation) {
     }
     
     //if active creature will not faint next turn
-    if (!swapOrAttack.isGonnaDie(activeHealth, enemyDamage))
+    if (!swapOrAttack.isGonnaDie(activeHealth, enemyAttack))
     {
         response = "a";
         
@@ -594,7 +597,7 @@ string Trainer::makeMove(stringstream& situation) {
     }
     else
     {
-        response = swapOrAttack.swapToHighestHealth(partyHealths, activeSlot);
+        swapOrAttack.swapToHighestHealth(partyHealths, activeSlot, response);
         
         if(swapOrAttack.isLastCreatureStanding(partyHealths, activeSlot))
         {
@@ -608,7 +611,7 @@ string Trainer::makeMove(stringstream& situation) {
             }
         }
         //if next turn any one of other creatures will swap, thus making swapping to loop infinite!
-        else if(swapOrAttack.areOthersGonnaDie(partyHealths, partyDamages))
+        else if(swapOrAttack.areOthersGonnaDieAfterNextTurn(partyHealths, enemyAttack))
         {
             /*
              SCROLL USAGE IN CLUTCH SITUATIONS
@@ -624,10 +627,12 @@ string Trainer::makeMove(stringstream& situation) {
             if(activeHealth == 0)
             {
                 //send other to the front line anyway
-                response = swapOrAttack.swapToHighestHealth(partyHealths, activeSlot);
+                swapOrAttack.swapToHighestHealth(partyHealths, activeSlot, response);
             }
         }
     }
+    cout << "enemy atk: " << enemyAttack << "\n";
+    cout << "response: " << response << "\n";
     return response;
 }
 
