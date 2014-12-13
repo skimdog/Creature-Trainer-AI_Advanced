@@ -23,6 +23,8 @@ class SwapOrAttack {
 public:
     static const int PARTY_SIZE = 5;
     
+    static const int DOUBLE_FACTOR = 2;
+    
     /**
      * Requires: Nothing.
      * Modifies: Nothing.
@@ -35,7 +37,7 @@ public:
      * Modifies: Nothing.
      * Effects:  Swaps to creature with highest current health
      */
-    string swapToHighestHealth(int partyHealths[], int activeSlot);
+    void swapToHighestHealth(int partyHealths[], int activeSlot, string& response);
     
     /**
      * Requires: Nothing.
@@ -43,7 +45,7 @@ public:
      * Effects: Swaps to creature with strength element equal to enemy's attack element
                 If none, returns 'a'
      */
-    string swapToStrElement(string enemyAtkElement, string partyStrElements[]);
+    void swapToStrElement(string enemyAtkElement, string partyStrElements[], int partyHealths[], string& response);
     
     /**
      * Requires: Nothing.
@@ -51,14 +53,21 @@ public:
      * Effects:  Swaps to creature with attack element equal to enemy's weakness
                  If none, returns 'a'
      */
-    string swapToAtkElement(string enemyWeakElement, string partyAtkElements[]);
+    void swapToAtkElement(string enemyWeakElement, string partyAtkElements[], string& response);
     
     /**
      * Requires: Nothing.
      * Modifies: Nothing.
      * Effects:  Returns true if attack element equal to enemy's strength element
      */
-    bool attackIsNotEffective(string enemyStrElement, string atkElement);
+    bool attackIsNotEffective(string atkElement, string enemyStrElement);
+    
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
+     * Effects:  Returns true if attack element equal to enemy's weak element
+     */
+    bool attackIsSuperEffective(string atkElement, string enemyWeakElement);
     
     /**
      * Requires: Nothing.
@@ -74,7 +83,7 @@ public:
      * Effects:  Returns true if enemy attack two turns later will deplete health of any
      one of other creatures besides active one
      */
-    bool areOthersGonnaDie(int partyHealths[], int partyDamages[]);
+    bool areOthersGonnaDieAfterNextTurn(int partyHealths[], int enemyAttack);
     
     /**
      * Requires: Nothing.
@@ -93,11 +102,24 @@ public:
     /**
      * Requires: Nothing.
      * Modifies: Nothing.
+     * Effects:  Returns usefulness # factor (health+attack) of creature at slot
+     */
+    int getUsefulness(int slot, int partyHealths[], int partyAttacks[]);
+    
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
      * Effects:  Revives any fainted creature in party.
                  If more than one, revives the most useful one.
      */
     void reviveMostUsefulCreature(int partyHealths[], int partyAttacks[], string& response);
     
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
+     * Effects:  Revives any fainted creature in party.
+     If more than one, revives the most useful one.
+     */
     void useScroll(int scrollPos, string& response);
     
 private:
@@ -110,6 +132,19 @@ private:
      */
     int getHighestHealth(int partyHealths[]);
     
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
+     * Effects: Swaps to creature at swapSlot
+     */
+    void swap(int swapSlot, string& response);
+    
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
+     * Effects:  Revives a creature, assuming it's fainted
+     */
+    void revive(int usefulSlot, string& response);
 };
 
 // ^^^^^^ And this line. That's it!
