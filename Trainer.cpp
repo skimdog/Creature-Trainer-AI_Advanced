@@ -515,6 +515,7 @@ string Trainer::makeMove(stringstream& situation) {
     {
         response = swapOrAttack.swapToHighestHealth(partyHealths, activeSlot);
         
+        //you can remove this if you want
         //use scroll if possible
         int scrollPos = CreatureType::TYPES[enemyTypeNum].getElementalWeakness();
         if(scrollList[scrollPos] > 0)
@@ -537,11 +538,14 @@ string Trainer::makeMove(stringstream& situation) {
             then use atkboost
          else use defboost
          */;
+        
+        //default response (rest)
         response = "r";
         
-        if(itemList[1] > 0 || itemList[2] > 0) //defBst/atkBst
+        //if have defBst/atkBst
+        if(itemList[1] > 0 || itemList[2] > 0)
         {
-            if(itemList[2] > itemList[1]) //atkBst > defBst
+            if(itemList[2] > itemList[1])
             {
                 response = "ab";
             }
@@ -551,6 +555,7 @@ string Trainer::makeMove(stringstream& situation) {
             }
         }
         
+        //if active health's is low
         if(activeHealth <= 10)
         {
             response = "r";
@@ -560,21 +565,27 @@ string Trainer::makeMove(stringstream& situation) {
             }
         }
         
+        //if have revive
         if(itemList[3] > 0)
         {
             swapOrAttack.reviveMostUsefulCreature(partyHealths, partyAttacks, response);
         }
         
-        if(itemList[4] > 0) //collar
+        //if have collar
+        if(itemList[4] > 0)
         {
             capture.captureCreature(enemyMaxHealth, enemyAttack, partyHealths, partyAttacks, response);
         }
         return response;
     }
+    
+    //if active creature will not faint next turn
     if (!swapOrAttack.isGonnaDie(activeHealth, enemyDamage))
     {
         response = "a";
         
+        //you can remove this if you want
+        //scroll
         int scrollPos = CreatureType::TYPES[enemyTypeNum].getElementalWeakness();
         if(scrollList[scrollPos] > 0)
         {
@@ -589,6 +600,8 @@ string Trainer::makeMove(stringstream& situation) {
         {
             response = "a";
             
+            //you can remove this if you want
+            //revive
             if(itemList[3] > 0)
             {
                 swapOrAttack.reviveMostUsefulCreature(partyHealths, partyAttacks, response);
