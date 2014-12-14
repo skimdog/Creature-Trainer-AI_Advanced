@@ -37,24 +37,38 @@ public:
      * Modifies: Nothing.
      * Effects:  Swaps to creature with highest current health
      */
-    void swapToHighestHealth(int partyHealths[], int activeSlot, string& response);
+    void swapToHighestHealth(int partyHealths[], int partyAttacks[], int activeSlot, string& response);
     
     /**
      * Requires: Nothing.
      * Modifies: Nothing.
-     * Effects: Swaps to creature with strength element equal to enemy's attack element
-                If none, swaps to creature with any other element
+     * Effects:  If any, swaps to creature elementally normal to enemy
      */
-    void swapToStrElement(string enemyAtkElement, string partyStrElements[], string partyWeakElements[], int partyHealths[], int partyAttacks[], int activeSlot, string& response);
+    void swapToNormal(string enemyAtkElement, string enemyStrElement, string partyAtkElements[], string partyWeakElements[], int partyHealths[], int activeSlot, string& response);
     
     /**
      * Requires: Nothing.
      * Modifies: Nothing.
-     * Effects:  Swaps to creature with attack element equal to enemy's weakness
-                 If none, returns 'a'
+     * Effects: If any, swaps to creature with best defensive stats
      */
-    void swapToAtkElement(string enemyWeakElement, string enemyStrElement, string partyAtkElements[], int partyHealths[], int partyAttacks[], int activeSlot, string& response);
+    void swapToDefensive(string enemyAtkElement, string enemyStrElement, string partyAtkElements[], string partyStrElements[], int partyHealths[], int activeSlot, string& response);
     
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
+     * Effects:  If any, swaps to creature with best offensive stats
+     */
+    void swapToOffensive(string enemyAtkElement, string enemyWeakElement, string partyAtkElements[], string partyWeakElements[], int partyHealths[], int activeSlot, string& response);
+    
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
+     * Effects:  Decides swapping at beginning of the battle
+     */
+    /*
+    void swapDecision(string enemyAtkElement, string enemyWeakElement, string enemyStrElement, string partyAtkElements[], string partyWeakElements[], string partyStrElements[], int partyHealths[], int activeSlot, string& response);
+    */
+     
     /**
      * Requires: Nothing.
      * Modifies: Nothing.
@@ -80,9 +94,15 @@ public:
      * Requires: Nothing.
      * Modifies: Nothing.
      * Effects:  Returns true if enemy attack next turn will deplete active creature's health
-     Otherwise false
      */
     bool isGonnaDie(int health, string strElement, string weakElement, int enemyAttack, string enemyAtkElement);
+    
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
+     * Effects:  Returns true if enemy attack after next turn will deplete active creature's health
+     */
+    bool isGonnaDieAfterNextTurn(int health, string strElement, string weakElement, int enemyAttack, string enemyAtkElement);
     
     /**
      * Requires: Nothing.
@@ -129,6 +149,13 @@ public:
      */
     void useScroll(int scrollPos, string& response);
     
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
+     * Effects:  Returns attack after elemental factors are applied
+     */
+    int getFactoredAttack(int activeAttack, string enemyStrElement, string enemyWeakElement, string activeAtkElement);
+    
 private:
     
     /**
@@ -137,7 +164,7 @@ private:
      * Effects:  Returns the slot (1,2,3,4) of creature
      with highest health
      */
-    int getHighestHealth(int partyHealths[]);
+    int getHighestHealth(int partyHealths[], int partyAttacks[]);
     
     /**
      * Requires: Nothing.

@@ -56,10 +56,19 @@ private:
     string partyStrElements[PARTY_SIZE];
     int partyAttacks[PARTY_SIZE];
     int partyHealths[PARTY_SIZE];
-    int partyDamages[PARTY_SIZE]; //store for all four creatures, to be updated as battle goes on
+    int partyDamages[PARTY_SIZE];
+    int partyRests[PARTY_SIZE];
+    
+    int enemyCurrentHealth;
     
     bool isStartofBattle; //true if new battle has started
     bool isEndofBattle;
+    
+    bool atkBst_InPlay;
+    bool defBst_InPlay;
+    
+    bool canFinishOff;
+    bool canScrollOff;
     
     int itemList[ITEM_LIST_SIZE];
     int scrollList[SCROLL_LIST_SIZE];

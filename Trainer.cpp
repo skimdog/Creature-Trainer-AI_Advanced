@@ -26,10 +26,15 @@
 
 using namespace std;
 
-string Trainer::makeMove(stringstream& situation) {
-    
-    isStartofBattle = false; //default
-    isEndofBattle = false; //default
+string Trainer::makeMove(stringstream& situation)
+{
+    //default
+    isStartofBattle = false;
+    isEndofBattle   = false;
+    atkBst_InPlay   = false;
+    defBst_InPlay   = false;
+    canFinishOff    = false;
+    canScrollOff    = false;
     
     //ParseHelp parseHelp; //make parsing easier!
     
@@ -100,7 +105,7 @@ string Trainer::makeMove(stringstream& situation) {
     //    four elements (and are skipping the empty ones.
     
     
-// *DETERMINE IF BATTLE HAS ENDED*
+// * DETERMINE IF BATTLE HAS ENDED *
     
     string battleEndLine;
     
@@ -123,6 +128,32 @@ string Trainer::makeMove(stringstream& situation) {
         }
     }
     
+    // * DETERMINES WHETHER AtkBst OR DefBst IS IN PLAY *
+    
+    string boostline;
+    
+    for(int i = 0; i < lines.size(); i++)
+    {
+        boostline = lines[i];
+        char c1 = boostline[3];
+        char c2 = boostline[4];
+        char c3 = boostline[5];
+        
+        if(c1 == 'B' && c2 == 's' && c3 == 't')
+        {
+            break;
+        }
+    }
+    vector<string> boostArray = splitString(boostline, " ");
+    
+    if(boostArray[0] == "AtkBst")
+    {
+        atkBst_InPlay = true;
+    }
+    if(boostArray[0] == "DefBst")
+    {
+        defBst_InPlay = true;
+    }
     
     // * INITIALIZE creatureParty *
     //first element (0) is empty; the rest (1,2,3,4) are four slots for four party creatures
@@ -144,6 +175,7 @@ string Trainer::makeMove(stringstream& situation) {
     string activeAtkElement  = "";
     string activeWeakElement = "";
     string activeStrElement  = "";
+    int activeRest = 0;
     //int activeMaxHealth = 0;
     int activeSlot = 0; // [1, 2, 3, 4]
     
@@ -240,12 +272,23 @@ string Trainer::makeMove(stringstream& situation) {
         strElement = CreatureType::elementName(strElement_Num, 0);
         partyStrElements[i] = strElement;
         
-        
         //STORE ATTACK AT CURRENT LEVEL
         int attack;
         int attackBase = CreatureType::TYPES[typeNum].getAttackBase();
         attack = attackBase + (CreatureType::TYPES[typeNum].getAttackPerLevel() * level);
+        
+        if(atkBst_InPlay)
+        {
+            attack *= SwapOrAttack::DOUBLE_FACTOR;
+        }
+        
         partyAttacks[i] = attack;
+        
+        //STORE REST INCREASE
+        int rest;
+        rest = CreatureType::TYPES[typeNum].getHealthRestIncrease();
+        partyRests[i] = rest;
+
         
         //if this creature is active
         if(isActive)
@@ -257,6 +300,7 @@ string Trainer::makeMove(stringstream& situation) {
             activeAtkElement = atkElement;
             activeWeakElement = weakElement;
             activeStrElement = strElement;
+            activeRest = rest;
             //activeMaxHealth = maxHealth;
             activeSlot = i;
         }
@@ -366,10 +410,24 @@ string Trainer::makeMove(stringstream& situation) {
     enemyBaseAttack = CreatureType::TYPES[enemyTypeNum].getAttackBase();
     enemyAttack = enemyBaseAttack + (CreatureType::TYPES[enemyTypeNum].getAttackPerLevel() * enemyLevel);
     
+    if(defBst_InPlay)
+    {
+        enemyAttack /= SwapOrAttack::DOUBLE_FACTOR;
+    }
+    
     //STORE ENEMY MAX HEALTH
     enemyMaxHealthBase = CreatureType::TYPES[enemyTypeNum].getHealthMaxBase();
     enemyMaxHealth = enemyMaxHealthBase + (CreatureType::TYPES[enemyTypeNum].getHealthMaxPerLevel() * enemyLevel);
 
+    //first calculate enemyMaxHealth into enemyCurrentHealth to keep track during battle
+    if(isStartofBattle)
+    {
+        enemyCurrentHealth = enemyMaxHealth;
+    }
+    else if(isEndofBattle)
+    {
+        enemyCurrentHealth = 0;
+    }
     
     //STORE ENEMY ATK ELEMENT
     int atkElement_Num = CreatureType::TYPES[enemyTypeNum].getElementalAttackType();
@@ -444,63 +502,29 @@ string Trainer::makeMove(stringstream& situation) {
         //testing
         //cout << "Scroll #" << i << ": " << scrollList[i - 2] << "\n";
     }
-
-    
-    //testing
-    /*
-    cout << "\n";
-    cout << "Enemy name: " << enemyName << " | Health: " << enemyMaxHealth << " | Level: " << enemyLevel << "\n";
-    cout << "AtkElement: " << enemyAtkElement << " | WeakElement: " << enemyWeakElement << " | StrElements: "<< enemyStrElement << "\n";
-    */
-    
-    // cout for testing only
-    /*
-    for (int i = 1; i < PARTY_SIZE; i++)
-    {
-        cout << "\n";
-        cout << "Name: " << partyNames[i] << " | Health: " << partyHealths[i] << " | Level: " << partyLevels[i] << " | Attack: " << partyAttacks[i] << " | Useful: " << partyHealths[i] + partyAttacks[i] << "\n";
-        cout << "AtkElement: " << partyAtkElements[i] << " | WeakElement: " << partyWeakElements[i] << " | StrElements: "<< partyStrElements[i] << "\n";
-        //cout << "Damaged by: " << partyDamages[i] << "\n";
-    }
-    */
-    //cout for testing
-    //cout << "Active: #" << activeNum << " " << activeName << " " << activeHealth << "/" << activeMaxHealth << "\n";
-    
-    // This is something else you can do ONLY for testing.
-    // In a previous post, I recommended #including CreatureType.h so that you
-    //    can make a Trainer::decide() function that will make the right
-    //    decision if you have perfect data about creature types.
-    // While developing, you can use the static vector<CreatureType> TYPES to
-    //    get that perfect information, though you will eventually need to write
-    //    your own function to learn that information from the data that is sent
-    //    in via stringstream& situation.
-    
-    /*
-     // This makes ct a copy of the CreatureType for Creature 0 (the Axolotyl).
-     // All CreatureType and Element names start with a different letter of the
-     //    alphabet (CreatureType is A-Z, Element is A-H).
-     CreatureType ct = CreatureType::TYPES[0];
-     // You can then get the type of ct, which is 0 because it's the Axolotyl
-     int type = ct.getType();
-     // You can also directly get info from CreatureTypes::TYPES elements.
-     int elementalWeakness3 = CreatureType::TYPES[3].getElementalWeakness();
-     */
-    
-    // Output for human player
-    // Instead of doing this, you will need to replace the code of Trainer
-    // to parse the input situation and create a proper response,
-    // (like "a" for attack or "s3" to swap to the creature in slot 3).
     cout << situationString;
 
-    /*
-     * This line is basically what your AI chooses to do
-     * When first playing, you may type in your move.
-     * For both the core and reach portions, however, you need to
-     * comment out "cin >> response" and instead have this function
-     * generate a response string.
-     */
+    /**///testing
+    /**/cout << "\n";
+    /**/cout << "\n";
+    /**/cout << "\n";
+    /**/cout << "Enemy name: " << enemyName << " | Health: " << enemyCurrentHealth << "/" << enemyMaxHealth << " | Level: " << enemyLevel << " | Attack: " << enemyAttack << "\n";
+    /**/cout << "AtkElement: " << enemyAtkElement << " | WeakElement: " << enemyWeakElement << " | StrElements: "<< enemyStrElement << "\n";
     
+    /**/cout << "\n";
+    /**/for (int i = 1; i < PARTY_SIZE; i++)
+    /**/{
+    /**/    cout << "\n";
+    /**/    cout << "Name: ";
+            if(i == activeSlot)
+            {
+                cout << "*";
+            }
+            cout << partyNames[i] << " | Health: " << partyHealths[i] << " | Level: " << partyLevels[i] << " | Attack: " << partyAttacks[i] << " | Useful: " << partyHealths[i] + partyAttacks[i] << " | Rest: " << partyRests[i] << "\n";
+    /**/    cout << "AtkElement: " << partyAtkElements[i] << " | WeakElement: " << partyWeakElements[i] << " | StrElements: "<< partyStrElements[i] << "\n";
+        /**/}
     
+
     //THE DECISION BEGINS HERE!!!
     SwapOrAttack swapOrAttack;
     Capture capture;
@@ -512,25 +536,20 @@ string Trainer::makeMove(stringstream& situation) {
    
     if (isStartofBattle)
     {
-        //swapOrAttack.swapToHighestHealth(partyHealths, activeSlot, response);
-        
-        //use scroll if possible
-        int scrollPos = CreatureType::TYPES[enemyTypeNum].getElementalWeakness();
-        if(scrollList[scrollPos] > 0)
+        //determine whether scroll can finish off enemy
+        if(enemyCurrentHealth <= Item::SCROLL_DAMAGE)
         {
-            swapOrAttack.useScroll(scrollPos, response);
+            canScrollOff = true;
         }
         
-        //immediately swap to overkill creature
-        swapOrAttack.swapToAtkElement(enemyWeakElement, enemyStrElement, partyAtkElements, partyHealths, partyAttacks, activeSlot, response);
+        //swapping decisions
+        swapOrAttack.swapToHighestHealth(partyHealths, partyAttacks, activeSlot, response);
         
-        //if enemy is super effective against active creature
-        if(swapOrAttack.attackIsSuperEffective(enemyAtkElement, activeWeakElement))
-        {
-            //immediately swap to elementally strong creature
-            swapOrAttack.swapToStrElement(enemyAtkElement, partyStrElements, partyWeakElements, partyHealths, partyAttacks, activeSlot, response);
-        }
-        return response;
+        swapOrAttack.swapToNormal(enemyAtkElement, enemyStrElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
+        
+        swapOrAttack.swapToOffensive(enemyAtkElement, enemyWeakElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
+        
+        swapOrAttack.swapToDefensive(enemyAtkElement, enemyStrElement, partyAtkElements, partyStrElements, partyHealths, activeSlot, response);
     }
     else if (isEndofBattle)
     {
@@ -584,60 +603,130 @@ string Trainer::makeMove(stringstream& situation) {
         {
             capture.captureCreature(enemyMaxHealth, enemyAttack, partyHealths, partyAttacks, response);
         }
-        return response;
     }
     
-    //if active creature will not faint next turn
-    if (!swapOrAttack.isGonnaDie(activeHealth, activeStrElement, activeWeakElement, enemyAttack, enemyAtkElement))
+    //during battle
+    else if(!isStartofBattle && !isEndofBattle)
     {
-        response = "a";
-        
-        //you can remove this if you want
-        //scroll
-        int scrollPos = CreatureType::TYPES[enemyTypeNum].getElementalWeakness();
-        if(scrollList[scrollPos] > 0)
+        //determine whether scroll can finish off enemy
+        if(enemyCurrentHealth <= Item::SCROLL_DAMAGE)
         {
-            swapOrAttack.useScroll(scrollPos, response);
+            canScrollOff = true;
         }
-    }
-    else
-    {
-        swapOrAttack.swapToHighestHealth(partyHealths, activeSlot, response);
         
-        if(swapOrAttack.isLastCreatureStanding(partyHealths, activeSlot))
+        //calculate what enemy's health will be next turn
+        int predictedAttack = swapOrAttack.getFactoredAttack(activeAttack, enemyStrElement, enemyWeakElement, activeAtkElement);
+        int predictedHealth = enemyCurrentHealth - predictedAttack;
+        
+        //OR
+        
+        int predictedDamage = swapOrAttack.getFactoredAttack(enemyAttack, activeStrElement, activeWeakElement, enemyAtkElement);
+        
+        int turnsToKill = ((double) enemyCurrentHealth / predictedAttack) + 0.5;
+        int turnsToDie  = ((double) activeHealth / predictedDamage) + 0.5;
+        
+        cout << "Kill: " << turnsToKill << "\n";
+        cout << "Die: " << turnsToDie << "\n";
+        
+        if(predictedHealth <= 0 || turnsToKill <= turnsToDie)
+        {
+            canFinishOff = true;
+        }
+        
+        //if active creature will not faint next turn
+        if (!swapOrAttack.isGonnaDie(activeHealth, activeStrElement, activeWeakElement, enemyAttack, enemyAtkElement))
         {
             response = "a";
             
             //you can remove this if you want
-            //revive
-            if(itemList[3] > 0)
+            //scroll
+            int scrollPos = CreatureType::TYPES[enemyTypeNum].getElementalWeakness();
+            if(scrollList[scrollPos] > 0)
             {
-                swapOrAttack.reviveMostUsefulCreature(partyHealths, partyAttacks, response);
+                swapOrAttack.useScroll(scrollPos, response);
+            }
+            
+            if(turnsToKill > turnsToDie)
+            {
+                if(itemList[1] > 0)
+                {
+                    response = "db";
+                }
             }
         }
-        //if next turn any one of other creatures will swap, thus making swapping to loop infinite!
-        else if(swapOrAttack.areOthersGonnaDieAfterNextTurn(partyHealths, partyStrElements, partyWeakElements, enemyAttack, enemyAtkElement))
+        //if active creature will faint next turn
+        else if(!swapOrAttack.isFainted(activeSlot, partyHealths) && swapOrAttack.isGonnaDie(activeHealth, activeStrElement, activeWeakElement, enemyAttack, enemyAtkElement))
         {
-            /*
-             SCROLL USAGE IN CLUTCH SITUATIONS
-             if infinite switching loop
-                if we have scroll for enemy weakness
-                    then use scroll(enemyWeakness)
-                    else response = 'a'
-             */
-            //just risk it!
-            response = "a";
+            swapOrAttack.swapToHighestHealth(partyHealths, partyAttacks, activeSlot, response);
             
-            //if active already fainted
-            if(activeHealth == 0)
+            swapOrAttack.swapToNormal(enemyAtkElement, enemyStrElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
+            
+            swapOrAttack.swapToOffensive(enemyAtkElement, enemyWeakElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
+            
+            swapOrAttack.swapToDefensive(enemyAtkElement, enemyStrElement, partyAtkElements, partyStrElements, partyHealths, activeSlot, response);
+            
+            if(swapOrAttack.isLastCreatureStanding(partyHealths, activeSlot))
             {
-                //send other to the front line anyway
-                swapOrAttack.swapToHighestHealth(partyHealths, activeSlot, response);
+                response = "a";
+                
+                //you can remove this if you want
+                //revive
+                if(itemList[3] > 0)
+                {
+                    swapOrAttack.reviveMostUsefulCreature(partyHealths, partyAttacks, response);
+                }
             }
+            //if next turn any one of other creatures will swap, thus making swapping to loop infinite!
+            else if(swapOrAttack.areOthersGonnaDieAfterNextTurn(partyHealths, partyStrElements, partyWeakElements, enemyAttack, enemyAtkElement))
+            {
+                response = "a";
+                
+                int scrollPos = CreatureType::TYPES[enemyTypeNum].getElementalWeakness();
+                if(scrollList[scrollPos] > 0)
+                {
+                    swapOrAttack.useScroll(scrollPos, response);
+                }
+                
+                if(turnsToKill > turnsToDie)
+                {
+                    if(itemList[1] > 0)
+                    {
+                        response = "db";
+                    }
+                }
+            }
+        }
+        else if(swapOrAttack.isFainted(activeSlot, partyHealths))
+        {
+            swapOrAttack.swapToHighestHealth(partyHealths, partyAttacks, activeSlot, response);
+            
+            swapOrAttack.swapToNormal(enemyAtkElement, enemyStrElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
+            
+            swapOrAttack.swapToOffensive(enemyAtkElement, enemyWeakElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
+            
+            swapOrAttack.swapToDefensive(enemyAtkElement, enemyStrElement, partyAtkElements, partyStrElements, partyHealths, activeSlot, response);
+        }
+        
+        //canScrollOff (2nd) / canFinishOff (1st)
+        if(canScrollOff && !swapOrAttack.isFainted(activeSlot, partyHealths))
+        {
+            int scrollPos = CreatureType::TYPES[enemyTypeNum].getElementalWeakness();
+            if(scrollList[scrollPos] > 0)
+            {
+                swapOrAttack.useScroll(scrollPos, response);
+            }
+        }
+        if(canFinishOff && !swapOrAttack.isFainted(activeSlot, partyHealths))
+        {
+            response = "a";
         }
     }
-    //testing
-    //cout << response << "\n";
+    //if final response is attack
+    if(response == "a")
+    {
+        //deduct active creature's attack from enemy's current health
+        enemyCurrentHealth -= swapOrAttack.getFactoredAttack(activeAttack, enemyStrElement, enemyWeakElement, activeAtkElement);
+    }
     return response;
 }
 
