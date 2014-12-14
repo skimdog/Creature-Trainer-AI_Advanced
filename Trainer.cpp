@@ -189,20 +189,18 @@ string Trainer::makeMove(stringstream& situation) {
         if(firstC == 'C')
         {
             char dash;
-            ss >> dash;
+            nameSS >> dash;
             name += dash; //this '-' not be mistaken as the '-' before level#
         }
-        else
+        
+        char dash;
+        nameSS >> dash;
+        while(dash != '-') //skip characteres until reaches '-'
         {
-            char dash;
+            name += dash;
             nameSS >> dash;
-            while(dash != '-') //skip characteres until reaches '-'
-            {
-                name += dash;
-                nameSS >> dash;
-            }
-            nameSS >> level; //parse out level#
         }
+        nameSS >> level; //parse out level#
         //parseHelp.parseNameAndLevel(name, level, name_level);
         
         partyNames[i] = name;
@@ -351,17 +349,15 @@ string Trainer::makeMove(stringstream& situation) {
         enemyNameSS >> dash;
         enemyName += dash; //this '-' not be mistaken as the '-' before level#
     }
-    else
+    
+    char dash;
+    enemyNameSS >> dash;
+    while(dash != '-') //skip characteres until reaches '-'
     {
-        char dash;
+        enemyName += dash;
         enemyNameSS >> dash;
-        while(dash != '-') //skip characteres until reaches '-'
-        {
-            enemyName += dash;
-            enemyNameSS >> dash;
-        }
-        enemyNameSS >> enemyLevel; //parse out level#
     }
+    enemyNameSS >> enemyLevel; //parse out level#
 
     //STORE ENEMY ATTACK AT CURRENT LEVEL
     char c = enemyName[0];
@@ -455,14 +451,14 @@ string Trainer::makeMove(stringstream& situation) {
     cout << "\n";
     cout << "Enemy name: " << enemyName << " | Health: " << enemyMaxHealth << " | Level: " << enemyLevel << "\n";
     cout << "AtkElement: " << enemyAtkElement << " | WeakElement: " << enemyWeakElement << " | StrElements: "<< enemyStrElement << "\n";
-     */
+    */
     
     // cout for testing only
     /*
     for (int i = 1; i < PARTY_SIZE; i++)
     {
         cout << "\n";
-        cout << "Name: " << partyNames[i] << " | Health: " << partyHealths[i] << " | Level: " << partyLevels[i] << "\n";
+        cout << "Name: " << partyNames[i] << " | Health: " << partyHealths[i] << " | Level: " << partyLevels[i] << " | Attack: " << partyAttacks[i] << " | Useful: " << partyHealths[i] + partyAttacks[i] << "\n";
         cout << "AtkElement: " << partyAtkElements[i] << " | WeakElement: " << partyWeakElements[i] << " | StrElements: "<< partyStrElements[i] << "\n";
         //cout << "Damaged by: " << partyDamages[i] << "\n";
     }
@@ -516,14 +512,23 @@ string Trainer::makeMove(stringstream& situation) {
    
     if (isStartofBattle)
     {
-        swapOrAttack.swapToHighestHealth(partyHealths, activeSlot, response);
+        //swapOrAttack.swapToHighestHealth(partyHealths, activeSlot, response);
         
-        //you can remove this if you want
         //use scroll if possible
         int scrollPos = CreatureType::TYPES[enemyTypeNum].getElementalWeakness();
         if(scrollList[scrollPos] > 0)
         {
             swapOrAttack.useScroll(scrollPos, response);
+        }
+        
+        //immediately swap to overkill creature
+        swapOrAttack.swapToAtkElement(enemyWeakElement, enemyStrElement, partyAtkElements, partyHealths, partyAttacks, activeSlot, response);
+        
+        //if enemy is super effective against active creature
+        if(swapOrAttack.attackIsSuperEffective(enemyAtkElement, activeWeakElement))
+        {
+            //immediately swap to elementally strong creature
+            swapOrAttack.swapToStrElement(enemyAtkElement, partyStrElements, partyWeakElements, partyHealths, partyAttacks, activeSlot, response);
         }
         return response;
     }
@@ -559,7 +564,7 @@ string Trainer::makeMove(stringstream& situation) {
         }
         
         //if active health's is low
-        if(activeHealth <= 10)
+        if(activeHealth <= Item::POTION_HEALTH)
         {
             response = "r";
             if(itemList[0] > 0) //potion
@@ -583,7 +588,7 @@ string Trainer::makeMove(stringstream& situation) {
     }
     
     //if active creature will not faint next turn
-    if (!swapOrAttack.isGonnaDie(activeHealth, enemyAttack))
+    if (!swapOrAttack.isGonnaDie(activeHealth, activeStrElement, activeWeakElement, enemyAttack, enemyAtkElement))
     {
         response = "a";
         
@@ -611,7 +616,7 @@ string Trainer::makeMove(stringstream& situation) {
             }
         }
         //if next turn any one of other creatures will swap, thus making swapping to loop infinite!
-        else if(swapOrAttack.areOthersGonnaDieAfterNextTurn(partyHealths, enemyAttack))
+        else if(swapOrAttack.areOthersGonnaDieAfterNextTurn(partyHealths, partyStrElements, partyWeakElements, enemyAttack, enemyAtkElement))
         {
             /*
              SCROLL USAGE IN CLUTCH SITUATIONS
@@ -631,8 +636,8 @@ string Trainer::makeMove(stringstream& situation) {
             }
         }
     }
-    cout << "enemy atk: " << enemyAttack << "\n";
-    cout << "response: " << response << "\n";
+    //testing
+    //cout << response << "\n";
     return response;
 }
 

@@ -43,9 +43,9 @@ public:
      * Requires: Nothing.
      * Modifies: Nothing.
      * Effects: Swaps to creature with strength element equal to enemy's attack element
-                If none, returns 'a'
+                If none, swaps to creature with any other element
      */
-    void swapToStrElement(string enemyAtkElement, string partyStrElements[], int partyHealths[], string& response);
+    void swapToStrElement(string enemyAtkElement, string partyStrElements[], string partyWeakElements[], int partyHealths[], int partyAttacks[], int activeSlot, string& response);
     
     /**
      * Requires: Nothing.
@@ -53,7 +53,7 @@ public:
      * Effects:  Swaps to creature with attack element equal to enemy's weakness
                  If none, returns 'a'
      */
-    void swapToAtkElement(string enemyWeakElement, string partyAtkElements[], string& response);
+    void swapToAtkElement(string enemyWeakElement, string enemyStrElement, string partyAtkElements[], int partyHealths[], int partyAttacks[], int activeSlot, string& response);
     
     /**
      * Requires: Nothing.
@@ -72,10 +72,17 @@ public:
     /**
      * Requires: Nothing.
      * Modifies: Nothing.
+     * Effects:  Returns true if attack element equal to any other than enemy's strength/weak elements
+     */
+    bool attackIsNormal(string atkElement, string enemyStrElement, string enemyWeakElement);
+    
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
      * Effects:  Returns true if enemy attack next turn will deplete active creature's health
      Otherwise false
      */
-    bool isGonnaDie(int health, int enemyATK);
+    bool isGonnaDie(int health, string strElement, string weakElement, int enemyAttack, string enemyAtkElement);
     
     /**
      * Requires: Nothing.
@@ -83,7 +90,7 @@ public:
      * Effects:  Returns true if enemy attack two turns later will deplete health of any
      one of other creatures besides active one
      */
-    bool areOthersGonnaDieAfterNextTurn(int partyHealths[], int enemyAttack);
+    bool areOthersGonnaDieAfterNextTurn(int partyHealths[], string partyStrElements[], string partyWeakElements[], int enemyAttack, string enemyAtkElement);
     
     /**
      * Requires: Nothing.
@@ -137,14 +144,14 @@ private:
      * Modifies: Nothing.
      * Effects: Swaps to creature at swapSlot
      */
-    void swap(int swapSlot, string& response);
+    void swapCommand(int swapSlot, string& response);
     
     /**
      * Requires: Nothing.
      * Modifies: Nothing.
      * Effects:  Revives a creature, assuming it's fainted
      */
-    void revive(int usefulSlot, string& response);
+    void reviveCommand(int usefulSlot, string& response);
 };
 
 // ^^^^^^ And this line. That's it!

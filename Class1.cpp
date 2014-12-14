@@ -17,7 +17,7 @@ SwapOrAttack::SwapOrAttack()
     
 }
 
-void SwapOrAttack::swap(int swapSlot, string& response)
+void SwapOrAttack::swapCommand(int swapSlot, string& response)
 {
     switch(swapSlot)
     {
@@ -58,23 +58,73 @@ void SwapOrAttack::swapToHighestHealth(int partyHealths[], int activeSlot, strin
     //if swapping with other than itself
     if(swapSlot != activeSlot)
     {
-        swap(swapSlot, response);
-    }
-    //otherwise
-    else
-    {
-        response = "a";
+        swapCommand(swapSlot, response);
     }
 }
 
-void SwapOrAttack::swapToStrElement(string enemyAtkElement, string partyStrElements[], int partyHealths[], string& response)
+void SwapOrAttack::swapToStrElement(string enemyAtkElement, string partyStrElements[], string partyWeakElements[], int partyHealths[], int partyAttacks[], int activeSlot, string& response)
 {
+    int swapSlot = 0;
+    int useFulness = 0;
+    bool strElementIsFound = false;
     for(int i = 1; i < PARTY_SIZE; i++)
     {
-        if(!isFainted(i, partyHealths) && attackIsNotEffective(enemyAtkElement, partyStrElements[i]))
+        //not fainted creature
+        if(!isFainted(i, partyHealths))
         {
-            
+            //if found
+            int newUsefulness = getUsefulness(i, partyHealths, partyAttacks);
+            if(attackIsNotEffective(enemyAtkElement, partyStrElements[i]) && useFulness < newUsefulness)
+            {
+                swapSlot = i;
+                useFulness = newUsefulness;
+                strElementIsFound = true;
+            }
+            //otherwise any other
+            else if(attackIsNormal(enemyAtkElement, partyStrElements[i], partyWeakElements[i]) && !strElementIsFound)
+            {
+                swapSlot = i;
+                useFulness = newUsefulness;
+            }
         }
+    }
+    //not itself
+    if(swapSlot != activeSlot)
+    {
+        swapCommand(swapSlot, response);
+    }
+}
+
+void SwapOrAttack::swapToAtkElement(string enemyWeakElement, string enemyStrElement, string partyAtkElements[], int partyHealths[], int partyAttacks[], int activeSlot, string& response)
+{
+    int swapSlot = 0;
+    int useFulness = 0;
+    bool superEffectiveFound = false;
+    for(int i = 1; i < PARTY_SIZE; i++)
+    {
+        //not fainted creature
+        if(!isFainted(i, partyHealths))
+        {
+            //if found
+            int newUsefulness = getUsefulness(i, partyHealths, partyAttacks);
+            if(attackIsSuperEffective(partyAtkElements[i], enemyWeakElement) && useFulness < newUsefulness)
+            {
+                swapSlot = i;
+                useFulness = newUsefulness;
+                superEffectiveFound = true;
+            }
+            //otherwise any other
+            else if(attackIsNormal(partyAtkElements[i], enemyStrElement, enemyWeakElement) && !superEffectiveFound)
+            {
+                swapSlot = i;
+                useFulness = newUsefulness;
+            }
+        }
+    }
+    //not itself
+    if(swapSlot != activeSlot)
+    {
+        swapCommand(swapSlot, response);
     }
 }
 
@@ -96,22 +146,48 @@ bool SwapOrAttack::attackIsSuperEffective(string atkElement, string enemyWeakEle
     return false;
 }
 
-bool SwapOrAttack::isGonnaDie(int health, int enemyATK)
+bool SwapOrAttack::attackIsNormal(string atkElement, string enemyStrElement, string enemyWeakElement)
 {
-    if (health <= enemyATK)
+    if(!attackIsNotEffective(atkElement, enemyStrElement) && !attackIsSuperEffective(atkElement, enemyWeakElement))
     {
         return true;
     }
     return false;
 }
 
-bool SwapOrAttack::areOthersGonnaDieAfterNextTurn(int partyHealths[], int enemyAttack)
+bool SwapOrAttack::isGonnaDie(int health, string strElement, string weakElement, int enemyAttack, string enemyAtkElement)
+{
+    if(attackIsSuperEffective(enemyAtkElement, weakElement))
+    {
+        if(health <= enemyAttack * DOUBLE_FACTOR)
+        {
+            return true;
+        }
+    }
+    else if(attackIsNotEffective(enemyAtkElement, strElement))
+    {
+        if(health <= enemyAttack / DOUBLE_FACTOR)
+        {
+            return true;
+        }
+    }
+    else
+    {
+        if(health <= enemyAttack)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool SwapOrAttack::areOthersGonnaDieAfterNextTurn(int partyHealths[], string partyStrElements[], string partyWeakElements[], int enemyAttack, string enemyAtkElement)
 {
     for(int i = 1; i < PARTY_SIZE; i++)
     {
         //hypothesizing future health one turn later
         int remainHealth = partyHealths[i] - enemyAttack;
-        if(!isGonnaDie(remainHealth, enemyAttack))
+        if(!isGonnaDie(remainHealth, partyStrElements[i], partyWeakElements[i], enemyAttack, enemyAtkElement))
         {
             return false;
         }
@@ -145,7 +221,7 @@ int SwapOrAttack::getUsefulness(int slot, int partyHealths[], int partyAttacks[]
     return partyHealths[slot] + partyAttacks[slot];
 }
 
-void SwapOrAttack::revive(int usefulSlot, string& response)
+void SwapOrAttack::reviveCommand(int usefulSlot, string& response)
 {
     switch(usefulSlot)
     {
@@ -175,13 +251,14 @@ void SwapOrAttack::reviveMostUsefulCreature(int partyHealths[], int partyAttacks
     }
     for(int i = 2; i < PARTY_SIZE; i++)
     {
-        if(isFainted(i, partyHealths) && mostUsefulness < getUsefulness(i, partyHealths, partyAttacks))
+        int newUsefulness = getUsefulness(i, partyHealths, partyAttacks);
+        if(isFainted(i, partyHealths) && mostUsefulness < newUsefulness)
         {
-            mostUsefulness = getUsefulness(i, partyHealths, partyAttacks);
+            mostUsefulness = newUsefulness;
             usefulSlot = i;
         }
     }
-    revive(usefulSlot, response);
+    reviveCommand(usefulSlot, response);
 }
 
 void SwapOrAttack::useScroll(int scrollPos, string& response)
