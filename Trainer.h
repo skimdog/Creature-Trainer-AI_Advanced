@@ -59,6 +59,8 @@ private:
     int partyDamages[PARTY_SIZE];
     int partyRests[PARTY_SIZE];
     
+    bool partyWinOrLose[PARTY_SIZE];
+    
     int enemyCurrentHealth;
     
     bool isStartofBattle; //true if new battle has started

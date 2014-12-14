@@ -102,7 +102,6 @@ void SwapOrAttack::swapToDefensive(string enemyAtkElement, string enemyStrElemen
 {
     int swapSlot = 0;
     int highHealth = 0;
-    //int useFulness = 0;
     for(int i = 1; i < PARTY_SIZE; i++)
     {
         //not fainted creature
@@ -110,12 +109,10 @@ void SwapOrAttack::swapToDefensive(string enemyAtkElement, string enemyStrElemen
         {
             //if found
             int higherHealth = partyHealths[i];
-            //int newUsefulness = getUsefulness(i, partyHealths, partyAttacks);
             if(attackIsNotEffective(enemyAtkElement, partyStrElements[i]) && highHealth < higherHealth)
             {
                 swapSlot = i;
                 highHealth = higherHealth;
-                //useFulness = newUsefulness;
             }
         }
     }
@@ -129,7 +126,6 @@ void SwapOrAttack::swapToOffensive(string enemyAtkElement, string enemyWeakEleme
 {
     int swapSlot = 0;
     int highHealth = 0;
-    //int useFulness = 0;
     for(int i = 1; i < PARTY_SIZE; i++)
     {
         //not fainted creature
@@ -137,13 +133,30 @@ void SwapOrAttack::swapToOffensive(string enemyAtkElement, string enemyWeakEleme
         {
             //if found
             int higherHealth = partyHealths[i];
-            //int newUsefulness = getUsefulness(i, partyHealths, partyAttacks);
             if(attackIsSuperEffective(partyAtkElements[i], enemyWeakElement) && !attackIsSuperEffective(enemyAtkElement, partyWeakElements[i]) && highHealth < higherHealth)
             {
                 swapSlot = i;
                 highHealth = higherHealth;
-                //useFulness = newUsefulness;
             }
+        }
+    }
+    if(swapSlot != activeSlot)
+    {
+        swapCommand(swapSlot, response);
+    }
+}
+
+void SwapOrAttack::swapToWinner(bool partyWinOrLose[], int partyHealths[], int activeSlot, string& response)
+{
+    int swapSlot = 0;
+    int highHealth = 0;
+    for(int i = 1; i < PARTY_SIZE; i++)
+    {
+        int higherHealth = partyHealths[i];
+        if(partyWinOrLose[i] && highHealth < higherHealth)
+        {
+            swapSlot = i;
+            highHealth = higherHealth;
         }
     }
     if(swapSlot != activeSlot)

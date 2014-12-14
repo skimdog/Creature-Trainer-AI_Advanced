@@ -63,6 +63,13 @@ public:
     /**
      * Requires: Nothing.
      * Modifies: Nothing.
+     * Effects:  If any, swaps to creature that will win 100%
+     */
+    void swapToWinner(bool partyWinOrLose[], int partyHealths[], int activeSlot, string& response);
+    
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
      * Effects:  Decides swapping at beginning of the battle
      */
     /*

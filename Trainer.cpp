@@ -442,8 +442,50 @@ string Trainer::makeMove(stringstream& situation)
     //STORE ENEMY STR ELEMENT
     int strElement_Num = CreatureType::TYPES[enemyTypeNum].getElementalStrength();
     enemyStrElement = CreatureType::elementName(strElement_Num, 0);
-
-
+    
+    
+    // * STORE PARTY RATIOS OF TURNS TO KILL : TURNS TO DIE *
+    
+    if(!isEndofBattle)
+    {
+        SwapOrAttack ratios;
+        
+        for(int i = 1; i < PARTY_SIZE; i++)
+        {
+            //calculate what enemy's health will be next turn
+            int predictedAttack = ratios.getFactoredAttack(partyAttacks[i], enemyStrElement, enemyWeakElement, partyAtkElements[i]);
+            int predictedDamage = ratios.getFactoredAttack(enemyAttack, partyStrElements[i], partyWeakElements[i], enemyAtkElement);
+            
+            int turnsToKill = ((double) enemyCurrentHealth / predictedAttack) + 0.5;
+            int turnsToDie  = ((double) partyHealths[i] / predictedDamage) + 0.5;
+            
+            bool canWin;
+            
+            if(activeSlot != i)
+            {
+                turnsToDie -= 1; //since swapping to non-active creature will let enemy attack once
+            }
+            
+            if(turnsToKill <= turnsToDie)
+            {
+                canWin = true;
+            }
+            else
+            {
+                canWin = false;
+            }
+            partyWinOrLose[i] = canWin;
+        }
+    }
+    //default
+    else
+    {
+        for(int i = 1; i < PARTY_SIZE; i++)
+        {
+            partyWinOrLose[i] = false;
+        }
+    }
+    
 //* STORE COUNTS FOR ALL ITEMS *
     
     string itemLine;
@@ -520,8 +562,16 @@ string Trainer::makeMove(stringstream& situation)
             {
                 cout << "*";
             }
-            cout << partyNames[i] << " | Health: " << partyHealths[i] << " | Level: " << partyLevels[i] << " | Attack: " << partyAttacks[i] << " | Useful: " << partyHealths[i] + partyAttacks[i] << " | Rest: " << partyRests[i] << "\n";
+            cout << partyNames[i] << " | Health: " << partyHealths[i] << " | Level: " << partyLevels[i] << " | Attack: " << partyAttacks[i] << " | Rest: " << partyRests[i] << "\n";
     /**/    cout << "AtkElement: " << partyAtkElements[i] << " | WeakElement: " << partyWeakElements[i] << " | StrElements: "<< partyStrElements[i] << "\n";
+            if(partyWinOrLose[i])
+            {
+                cout << "Winner! \n";
+            }
+            else
+            {
+                cout << "Loser \n";
+            }
         /**/}
     
 
@@ -542,14 +592,18 @@ string Trainer::makeMove(stringstream& situation)
             canScrollOff = true;
         }
         
-        //swapping decisions
-        swapOrAttack.swapToHighestHealth(partyHealths, partyAttacks, activeSlot, response);
-        
-        swapOrAttack.swapToNormal(enemyAtkElement, enemyStrElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
-        
-        swapOrAttack.swapToOffensive(enemyAtkElement, enemyWeakElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
-        
-        swapOrAttack.swapToDefensive(enemyAtkElement, enemyStrElement, partyAtkElements, partyStrElements, partyHealths, activeSlot, response);
+        //if active creature cannot win, swap
+            //swapping decisions
+            swapOrAttack.swapToHighestHealth(partyHealths, partyAttacks, activeSlot, response);
+            cout << response << "\n";
+            swapOrAttack.swapToNormal(enemyAtkElement, enemyStrElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
+            cout << response << "\n";
+            swapOrAttack.swapToOffensive(enemyAtkElement, enemyWeakElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
+            cout << response << "\n";
+            swapOrAttack.swapToDefensive(enemyAtkElement, enemyStrElement, partyAtkElements, partyStrElements, partyHealths, activeSlot, response);
+            cout << response << "\n";
+            swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
+            cout << response << "\n";
     }
     else if (isEndofBattle)
     {
