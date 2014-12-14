@@ -681,15 +681,15 @@ string Trainer::makeMove(stringstream& situation)
         {
             canScrollOff = true;
         }
-        
-        if(enemyCurrentHealth <= predictedAttack || partyWinOrLose[activeSlot])
-        {
-            canFinishOff = true;
-        }
-        
         //if active creature will not faint next turn
         if (!swapOrAttack.isGonnaDie(activeHealth, activeStrElement, activeWeakElement, enemyAttack, enemyAtkElement))
         {
+            
+            if(enemyCurrentHealth <= predictedAttack || partyWinOrLose[activeSlot])
+            {
+                canFinishOff = true;
+            }
+            
             response = "a";
             
             //you can remove this if you want
@@ -715,6 +715,12 @@ string Trainer::makeMove(stringstream& situation)
         //if active creature will faint next turn
         else if(!swapOrAttack.isFainted(activeSlot, partyHealths) && swapOrAttack.isGonnaDie(activeHealth, activeStrElement, activeWeakElement, enemyAttack, enemyAtkElement))
         {
+            
+            if(enemyCurrentHealth <= predictedAttack || partyWinOrLose[activeSlot])
+            {
+                canFinishOff = true;
+            }
+            
             swapOrAttack.swapToHighestHealth(partyHealths, partyAttacks, activeSlot, response);
             
             swapOrAttack.swapToNormal(enemyAtkElement, enemyStrElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
@@ -785,6 +791,11 @@ string Trainer::makeMove(stringstream& situation)
             response = "a";
         }
     }
+    if(canFinishOff)
+    {
+        response = "a";
+    }
+    
     //if final response is attack
     if(response == "a")
     {
