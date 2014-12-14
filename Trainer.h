@@ -56,10 +56,13 @@ private:
     string partyStrElements[PARTY_SIZE];
     int partyAttacks[PARTY_SIZE];
     int partyHealths[PARTY_SIZE];
+    int partyMaxHealths[PARTY_SIZE];
     int partyDamages[PARTY_SIZE];
     int partyRests[PARTY_SIZE];
     
     bool partyWinOrLose[PARTY_SIZE];
+    bool partyLastHopes[PARTY_SIZE];
+    int lastHope;
     
     int enemyCurrentHealth;
     

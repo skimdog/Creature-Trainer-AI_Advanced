@@ -263,9 +263,9 @@ int SwapOrAttack::getUsefulness(int slot, int partyHealths[], int partyAttacks[]
     return partyHealths[slot] + partyAttacks[slot];
 }
 
-void SwapOrAttack::reviveCommand(int usefulSlot, string& response)
+void SwapOrAttack::reviveCommand(int reviveSlot, string& response)
 {
-    switch(usefulSlot)
+    switch(reviveSlot)
     {
         case 1:
             response = "re1";
@@ -350,3 +350,78 @@ int SwapOrAttack::getFactoredAttack(int activeAttack, string enemyStrElement, st
     }
 }
 
+bool SwapOrAttack::allIsNotWell(bool partyWinOrLose[])
+{
+    for(int i = 1; i < PARTY_SIZE; i++)
+    {
+        if(partyWinOrLose[i])
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+int SwapOrAttack::getTurnsToKill(int enemyCurrentHealth, string enemyWeakElement, string enemyStrElement, int partyAttacks[], string partyAtkElements[], int slot)
+{
+    int predictedAttack = getFactoredAttack(partyAttacks[slot], enemyStrElement, enemyWeakElement, partyAtkElements[slot]);
+    int turnsToKill = (enemyCurrentHealth + predictedAttack - 1) / predictedAttack;
+    
+    return turnsToKill;
+}
+
+int SwapOrAttack::getTurnsToDie(int partyHealths[], string partyWeakElements[], string partyStrElements[], int enemyAttack, string enemyAtkElement, int slot)
+{
+    int predictedDamage = getFactoredAttack(enemyAttack, partyStrElements[slot], partyWeakElements[slot], enemyAtkElement);
+    int turnsToDie = (partyHealths[slot] + predictedDamage - 1) / predictedDamage;
+    
+    return turnsToDie;
+}
+
+bool SwapOrAttack::calculateWinLose(int enemyAttack, string enemyAtkElement, string enemyWeakElement, string enemyStrElement, int enemyCurrentHealth, int partyAttacks[], string partyAtkElements[], string partyWeakElements[], string partyStrElements[], int partyHealths[], int slot, int activeSlot, bool lastHope)
+{
+    int turnsToKill = getTurnsToKill(enemyCurrentHealth, enemyWeakElement, enemyStrElement, partyAttacks, partyAtkElements, slot);
+    int turnsToDie = getTurnsToDie(partyHealths, partyWeakElements, partyStrElements, enemyAttack, enemyAtkElement, slot);
+    
+    if(activeSlot != slot || lastHope)
+    {
+        turnsToDie -= 1; //since swapping to non-active creature will let enemy attack once
+    }
+    
+    if(turnsToKill <= turnsToDie)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool SwapOrAttack::thereisStillHope(bool partyLastHopes[], int& hopeSlot)
+{
+    for(int i = 1; i < PARTY_SIZE; i++)
+    {
+        if(partyLastHopes[i])
+        {
+            hopeSlot = i;
+            return true;
+        }
+    }
+    return false;
+}
+
+void SwapOrAttack::swapToStall(int partyHealths[], string partyStrElements[], string partyWeakElements[], int enemyAttack, string enemyAtkElement, int hopeSlot, int activeSlot, string& response)
+{
+    for(int i = 1; i < PARTY_SIZE; i++)
+    {
+        if(i != activeSlot && i != hopeSlot && isFainted(i, partyHealths))
+        {
+            if(!isGonnaDie(partyHealths[i], partyStrElements[i], partyWeakElements[i], enemyAttack, enemyAtkElement))
+            {
+                swapCommand(i, response);
+                break;
+            }
+        }
+    }
+}

@@ -143,6 +143,13 @@ public:
     /**
      * Requires: Nothing.
      * Modifies: Nothing.
+     * Effects:  Revives a creature, assuming it's fainted
+     */
+    void reviveCommand(int reviveSlot, string& response);
+    
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
      * Effects:  Revives any fainted creature in party.
                  If more than one, revives the most useful one.
      */
@@ -163,6 +170,50 @@ public:
      */
     int getFactoredAttack(int activeAttack, string enemyStrElement, string enemyWeakElement, string activeAtkElement);
     
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
+     * Effects:  Revives true if all four creatures don't stand a chance
+     */
+    bool allIsNotWell(bool partyWinOrLose[]);
+    
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
+     * Effects:  Returns number of turns for creature to kill enemy
+                 (Used in calculateWinLose)
+     */
+    int getTurnsToKill(int enemyCurrentHealth, string enemyWeakElement, string enemyStrElement, int partyAttacks[], string partyAtkElements[], int slot);
+    
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
+     * Effects:  Returns number of turns for creature to die from enemy
+                 (Used in calculateWinLose)
+     */
+    int getTurnsToDie(int partyHealths[], string partyWeakElements[], string partyStrElements[], int enemyAttack, string enemyAtkElement, int slot);
+    
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
+     * Effects:  Returns true if turns to kill <= turns to die (-1 if swapping to creature) for creature at slot
+     */
+    bool calculateWinLose(int enemyAttack, string enemyAtkElement, string enemyWeakElement, string enemyStrElement, int enemyCurrentHealth, int partyAttacks[], string partyAtkElements[], string partyWeakElements[], string partyStrElements[], int partyHealths[], int slot, int activeSlot, bool lastHope);
+    
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
+     * Effects:  Returns creature that will put an end to infinite swapping once and for all!!
+     */
+    bool thereisStillHope(bool partyLastHopes[], int& hopeSlot);
+    
+    /**
+     * Requires: Nothing.
+     * Modifies: Nothing.
+     * Effects:  Swap to any creature that won't die next turn
+     */
+    void swapToStall(int partyHealths[], string partyStrElements[], string partyWeakElements[], int enemyAttack, string enemyAttackElement, int hopeSlot, int activeSlot, string& response);
+    
 private:
     
     /**
@@ -179,13 +230,6 @@ private:
      * Effects: Swaps to creature at swapSlot
      */
     void swapCommand(int swapSlot, string& response);
-    
-    /**
-     * Requires: Nothing.
-     * Modifies: Nothing.
-     * Effects:  Revives a creature, assuming it's fainted
-     */
-    void reviveCommand(int usefulSlot, string& response);
 };
 
 // ^^^^^^ And this line. That's it!

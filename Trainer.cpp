@@ -167,25 +167,22 @@ string Trainer::makeMove(stringstream& situation)
 //* STORING NAMES, LEVELS, ATTACK ELEMENTS, CURRENT ATTACKS, & CURRENT HEALTHS in arrays *
     
     //STORE INFO ABOUT ACTIVE CREATURE
-    bool isActive; //true when name starts with '*'
-    string activeName = "";
-    int activeLevel  = 0;
-    int activeHealth = 0;
-    int activeAttack = 0;
+    bool isActive;
+    string activeName   = "";
+    int activeLevel     = 0;
+    int activeHealth    = 0;
+    int activeMaxHealth = 0;
+    int activeAttack    = 0;
     string activeAtkElement  = "";
     string activeWeakElement = "";
     string activeStrElement  = "";
     int activeRest = 0;
-    //int activeMaxHealth = 0;
-    int activeSlot = 0; // [1, 2, 3, 4]
+    int activeSlot = 0;
     
     for (int i = 1; i < PARTY_SIZE; i++)
     {
         isActive = false;
-        // cout just for testing
-        //cout << creatureHealthBits[i] << "\n";
         
-        // We are putting the string into a stringStream so we can use >>
         stringstream ss;
         ss << creatureParty[i];
         
@@ -243,14 +240,6 @@ string Trainer::makeMove(stringstream& situation)
         ss >> health; // health = 10
         partyHealths[i] = health;
         
-        // Get rid of the slash char
-        //char slash;
-        //ss >> slash; // slash = '/'
-        
-        // get max health
-        //int maxHealth;
-        //ss >> maxHealth; // maxHealth = 10
-        
         //STORE ATK, WEAK, & STR ELEMENTS
         char c = name[0];
         int typeNum = c - 'A';
@@ -288,6 +277,12 @@ string Trainer::makeMove(stringstream& situation)
         int rest;
         rest = CreatureType::TYPES[typeNum].getHealthRestIncrease();
         partyRests[i] = rest;
+        
+        
+        //STORE MAX HEALTH, just in case!
+        int maxHealthBase = CreatureType::TYPES[typeNum].getHealthMaxBase();
+        int maxHealth = maxHealthBase + (CreatureType::TYPES[typeNum].getHealthMaxPerLevel() * level);
+        partyMaxHealths[i] = maxHealth;
 
         
         //if this creature is active
@@ -301,7 +296,7 @@ string Trainer::makeMove(stringstream& situation)
             activeWeakElement = weakElement;
             activeStrElement = strElement;
             activeRest = rest;
-            //activeMaxHealth = maxHealth;
+            activeMaxHealth = maxHealth;
             activeSlot = i;
         }
     }
@@ -338,31 +333,6 @@ string Trainer::makeMove(stringstream& situation)
         }
     }
     enemySS << enemyAttackLine;
-    
-    //may not use this at all
-    
-    /*int enemyDamage = 0;
-    string skip;
-    
-    if(isStartofBattle)
-    {
-        //sets partyDamages to default
-        for(int i = 1; i < PARTY_SIZE; i++)
-        {
-            partyDamages[i] = 0;
-        }
-    }
-    else
-    {
-        for(int j = 0; j < NUM_OF_SKIPS; j++)
-        {
-            enemySS >> skip;
-        }
-        enemySS >> enemyDamage;
-        partyDamages[activeSlot] = enemyDamage;
-        //cout << "Attack damage: " << enemyATK << "\n";
-    }*/
-
     
     //STORE ENEMY NAME & LEVEL
     string enemyName_Level = "";
@@ -452,32 +422,15 @@ string Trainer::makeMove(stringstream& situation)
         
         for(int i = 1; i < PARTY_SIZE; i++)
         {
-            //calculate what enemy's health will be next turn
-            int predictedAttack = ratios.getFactoredAttack(partyAttacks[i], enemyStrElement, enemyWeakElement, partyAtkElements[i]);
-            int predictedDamage = ratios.getFactoredAttack(enemyAttack, partyStrElements[i], partyWeakElements[i], enemyAtkElement);
+            //regular ratios
+            bool canWin = ratios.calculateWinLose(enemyAttack, enemyAtkElement, enemyWeakElement, enemyStrElement, enemyCurrentHealth, partyAttacks, partyAtkElements, partyWeakElements, partyStrElements, partyHealths, i, activeSlot, false);
             
-            //int turnsToKill = (int)((static_cast<double>(enemyCurrentHealth)/ predictedAttack) + 0.5);
-            //int turnsToDie  = (int)((static_cast<double>(partyHealths[i])/ predictedDamage) + 0.5);
-            
-            int turnsToKill = (enemyCurrentHealth + predictedAttack - 1) / predictedAttack;
-            int turnsToDie = (partyHealths[i] + predictedDamage - 1) / predictedDamage;
-            
-            bool canWin;
-            
-            if(activeSlot != i)
-            {
-                turnsToDie -= 1; //since swapping to non-active creature will let enemy attack once
-            }
-            
-            if(turnsToKill <= turnsToDie)
-            {
-                canWin = true;
-            }
-            else
-            {
-                canWin = false;
-            }
             partyWinOrLose[i] = canWin;
+            
+            //used for last-resort strategy
+            bool hope = ratios.calculateWinLose(enemyAttack, enemyAtkElement, enemyWeakElement, enemyStrElement, enemyCurrentHealth, partyAttacks, partyAtkElements, partyWeakElements, partyStrElements, partyMaxHealths, i, activeSlot, true);
+            
+            partyLastHopes[i] = hope;
         }
     }
     //default
@@ -565,7 +518,7 @@ string Trainer::makeMove(stringstream& situation)
             {
                 cout << "*";
             }
-            cout << partyNames[i] << " | Health: " << partyHealths[i] << " | Level: " << partyLevels[i] << " | Attack: " << partyAttacks[i] << " | Rest: " << partyRests[i] << "\n";
+            cout << partyNames[i] << " | Health: " << partyHealths[i] << "/" << partyMaxHealths[i] << " | Level: " << partyLevels[i] << " | Attack: " << partyAttacks[i] << " | Rest: " << partyRests[i] << "\n";
     /**/    cout << "AtkElement: " << partyAtkElements[i] << " | WeakElement: " << partyWeakElements[i] << " | StrElements: "<< partyStrElements[i] << "\n";
             if(partyWinOrLose[i])
             {
@@ -577,23 +530,23 @@ string Trainer::makeMove(stringstream& situation)
             }
         /**/}
     
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //THE DECISION BEGINS HERE!!!
     SwapOrAttack swapOrAttack;
     Capture capture;
     
+    
+    //default response = attack
     string response = "a";
-    //cin >> response;
     
     //every start of battle, swap
-   
     if (isStartofBattle)
     {
-        //determine whether scroll can finish off enemy
-        if(enemyCurrentHealth <= Item::SCROLL_DAMAGE)
-        {
-            canScrollOff = true;
-        }
+        //predicted active creature attack
+        int predictedAttack = swapOrAttack.getFactoredAttack(partyAttacks[activeSlot], enemyStrElement, enemyWeakElement, partyAtkElements[activeSlot]);
+        int scrollDamage = Item::SCROLL_DAMAGE * swapOrAttack.DOUBLE_FACTOR;
+        int scrollPos = CreatureType::TYPES[enemyTypeNum].getElementalWeakness();
+
             //swapping decisions
             swapOrAttack.swapToHighestHealth(partyHealths, partyAttacks, activeSlot, response);
             cout << response << "\n";
@@ -606,32 +559,27 @@ string Trainer::makeMove(stringstream& situation)
             swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
             cout << response << "\n";
         
+        //if active creature can take this
         if(partyWinOrLose[activeSlot])
         {
             canFinishOff = true;
         }
         
-        int scrollPos = CreatureType::TYPES[enemyTypeNum].getElementalWeakness();
-        if(scrollList[scrollPos] > 0)
+        //determine whether scroll can finish off enemy
+        if(scrollList[scrollPos] > 0 && enemyCurrentHealth <= scrollDamage)
+        {
+            canScrollOff = true;
+        }
+        
+        if(scrollList[scrollPos] > 0 && predictedAttack < scrollDamage)
         {
             swapOrAttack.useScroll(scrollPos, response);
         }
     }
+    
+    //end of battle
     else if (isEndofBattle)
     {
-        /* END BATTLE LOGIC
-         default = ??
-         if we have a dead thing
-            if enemy usefulness > dead pokemon usefulness
-                then capture
-                else revive dead pokemon
-         elseif active health less than 1/2
-            then use potion
-         elseif number of atkboosts > number of defboots
-            then use atkboost
-         else use defboost
-         */;
-        
         //default response (rest)
         response = "r";
         
@@ -649,10 +597,10 @@ string Trainer::makeMove(stringstream& situation)
         }
         
         //if active health's is low
-        if(activeHealth <= Item::POTION_HEALTH)
+        if(Item::POTION_HEALTH <= activeMaxHealth - activeHealth)
         {
             response = "r";
-            if(itemList[0] > 0) //potion
+            if(itemList[0] > 0 && activeMaxHealth - activeHealth <= activeRest) //potion
             {
                 response = "po";
             }
@@ -675,27 +623,16 @@ string Trainer::makeMove(stringstream& situation)
     else if(!isStartofBattle && !isEndofBattle)
     {
         int predictedAttack = swapOrAttack.getFactoredAttack(partyAttacks[activeSlot], enemyStrElement, enemyWeakElement, partyAtkElements[activeSlot]);
+        int scrollDamage = Item::SCROLL_DAMAGE * swapOrAttack.DOUBLE_FACTOR;
+        int scrollPos = CreatureType::TYPES[enemyTypeNum].getElementalWeakness();
         
-        //determine whether scroll can finish off enemy
-        if(enemyCurrentHealth <= Item::SCROLL_DAMAGE)
-        {
-            canScrollOff = true;
-        }
         //if active creature will not faint next turn
         if (!swapOrAttack.isGonnaDie(activeHealth, activeStrElement, activeWeakElement, enemyAttack, enemyAtkElement))
         {
-            
-            if(enemyCurrentHealth <= predictedAttack || partyWinOrLose[activeSlot])
-            {
-                canFinishOff = true;
-            }
-            
             response = "a";
             
-            //you can remove this if you want
             //scroll
-            int scrollPos = CreatureType::TYPES[enemyTypeNum].getElementalWeakness();
-            if(scrollList[scrollPos] > 0)
+            if(scrollList[scrollPos] > 0 && predictedAttack < scrollDamage)
             {
                 swapOrAttack.useScroll(scrollPos, response);
             }
@@ -715,12 +652,6 @@ string Trainer::makeMove(stringstream& situation)
         //if active creature will faint next turn
         else if(!swapOrAttack.isFainted(activeSlot, partyHealths) && swapOrAttack.isGonnaDie(activeHealth, activeStrElement, activeWeakElement, enemyAttack, enemyAtkElement))
         {
-            
-            if(enemyCurrentHealth <= predictedAttack || partyWinOrLose[activeSlot])
-            {
-                canFinishOff = true;
-            }
-            
             swapOrAttack.swapToHighestHealth(partyHealths, partyAttacks, activeSlot, response);
             
             swapOrAttack.swapToNormal(enemyAtkElement, enemyStrElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
@@ -747,17 +678,34 @@ string Trainer::makeMove(stringstream& situation)
             {
                 response = "a";
                 
-                int scrollPos = CreatureType::TYPES[enemyTypeNum].getElementalWeakness();
-                if(scrollList[scrollPos] > 0)
+                if(scrollList[scrollPos] > 0 && predictedAttack < scrollDamage)
                 {
                     swapOrAttack.useScroll(scrollPos, response);
                 }
                 
                 if(!partyWinOrLose[activeSlot])
                 {
+                    if(itemList[2] > 0)
+                    {
+                        response = "ab";
+                    }
                     if(itemList[1] > 0)
                     {
                         response = "db";
+                    }
+                }
+                
+                //in-progress LAST-HOPE STRATEGY TO END INFINITE SWAPPING!!!
+                if(swapOrAttack.allIsNotWell(partyWinOrLose))
+                {
+                    if(swapOrAttack.thereisStillHope(partyLastHopes, lastHope))
+                    {
+                        if(swapOrAttack.isFainted(lastHope, partyHealths))
+                        //i really hope this works!
+                        swapOrAttack.swapToStall(partyHealths, partyStrElements, partyWeakElements, enemyAttack, enemyAtkElement, lastHope, activeSlot, response);
+                        //cout << "IT WORKED!!!!!!!!!!!!!!!!!!!!" << "\n";
+                        
+                        //cout << "Last hope: " << partyNames[lastHope] << "\n";
                     }
                 }
             }
@@ -766,6 +714,8 @@ string Trainer::makeMove(stringstream& situation)
         //if already fainted
         else if(swapOrAttack.isFainted(activeSlot, partyHealths))
         {
+            canFinishOff = false;
+            
             swapOrAttack.swapToHighestHealth(partyHealths, partyAttacks, activeSlot, response);
             
             swapOrAttack.swapToNormal(enemyAtkElement, enemyStrElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
@@ -777,18 +727,16 @@ string Trainer::makeMove(stringstream& situation)
             swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
         }
         
-        //canScrollOff (2nd) / canFinishOff (1st)
-        if(canScrollOff && !swapOrAttack.isFainted(activeSlot, partyHealths))
+        //if active creature can take this
+        if(partyWinOrLose[activeSlot] && swapOrAttack.isFainted(activeSlot, partyHealths))
         {
-            int scrollPos = CreatureType::TYPES[enemyTypeNum].getElementalWeakness();
-            if(scrollList[scrollPos] > 0)
-            {
-                swapOrAttack.useScroll(scrollPos, response);
-            }
+            canFinishOff = true;
         }
-        if(canFinishOff && !swapOrAttack.isFainted(activeSlot, partyHealths))
+        
+        //determine whether scroll can finish off enemy
+        if(scrollList[scrollPos] > 0 && enemyCurrentHealth <= scrollDamage)
         {
-            response = "a";
+            canScrollOff = true;
         }
     }
     if(canFinishOff)
@@ -802,6 +750,15 @@ string Trainer::makeMove(stringstream& situation)
         //deduct active creature's attack from enemy's current health
         enemyCurrentHealth -= swapOrAttack.getFactoredAttack(activeAttack, enemyStrElement, enemyWeakElement, activeAtkElement);
     }
+    
+    //determine whether scroll has been used, in order to update enemy's current health
+    char c1 = response[0];
+    char c2 = response[1];
+    if(c1 == 's' && (c2 == 'a' || c2 == 'b' || c2 == 'c' || c2 == 'd' || c2 == 'e' || c2 == 'f' || c2 == 'g' || c2 == 'h'))
+    {
+        enemyCurrentHealth -= Item::SCROLL_DAMAGE * SwapOrAttack::DOUBLE_FACTOR;
+    }
+    
     return response;
 }
 
