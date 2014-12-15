@@ -66,16 +66,14 @@ public:
      * Effects:  If any, swaps to creature that will win 100%
      */
     void swapToWinner(bool partyWinOrLose[], int partyHealths[], int activeSlot, string& response);
-    
+    /*
     /**
      * Requires: Nothing.
      * Modifies: Nothing.
-     * Effects:  Decides swapping at beginning of the battle
-     */
-    /*
-    void swapDecision(string enemyAtkElement, string enemyWeakElement, string enemyStrElement, string partyAtkElements[], string partyWeakElements[], string partyStrElements[], int partyHealths[], int activeSlot, string& response);
-    */
+     * Effects:  Assuming there are no winners; swaps to best loser
      
+    void swapToBestLoser(int enemyAttack, int enemyCurrentHealth, string enemyAtkElement, string enemyWeakElement, string enemyStrElement, int partyAttacks[], int partyHealths[], string partyAtkElements[], string partyWeakElements[], string partyStrElements[], int activeSlot, string& response);
+    */
     /**
      * Requires: Nothing.
      * Modifies: Nothing.

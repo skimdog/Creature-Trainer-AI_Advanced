@@ -164,16 +164,35 @@ void SwapOrAttack::swapToWinner(bool partyWinOrLose[], int partyHealths[], int a
         swapCommand(swapSlot, response);
     }
 }
-
 /*
-void SwapOrAttack::swapDecision(string enemyAtkElement, string enemyWeakElement, string enemyStrElement, string partyAtkElements[], string partyWeakElements[], string partyStrElements[], int partyHealths[], int activeSlot, string& response)
+void SwapOrAttack::swapToBestLoser(int enemyAttack, int enemyCurrentHealth, string enemyAtkElement, string enemyWeakElement, string enemyStrElement, int partyAttacks[], int partyHealths[], string partyAtkElements[], string partyWeakElements[], string partyStrElements[], int activeSlot, string& response)
 {
-    swapToHighestHealth(partyHealths, partyAttacks, activeSlot, response);
-    swapToNormal(enemyAtkElement, enemyStrElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
-    swapToOffensive(enemyWeakElement, partyAtkElements, partyHealths, activeSlot, response);
-    swapToDefensive(enemyAtkElement, partyStrElements, partyHealths, activeSlot, response);
+    int swapSlot = 1;
+    int turnsToDie = getTurnsToDie(partyHealths, partyWeakElements, partyStrElements, enemyAttack, enemyAtkElement, 1);
+    int turnsToKill = getTurnsToKill(enemyCurrentHealth, enemyWeakElement, enemyStrElement, partyAttacks, partyAtkElements, 1);
+    int bestRatio = turnsToDie / turnsToKill;
+    int highHealth = partyHealths[1];
+    for(int i = 2; i < PARTY_SIZE; i++)
+    {
+        int newTurnsToDie = getTurnsToDie(partyHealths, partyWeakElements, partyStrElements, enemyAttack, enemyAtkElement, i);
+        int newturnsToKill = getTurnsToKill(enemyCurrentHealth, enemyWeakElement, enemyStrElement, partyAttacks, partyAtkElements, i);
+        int betterRatio = newTurnsToDie / newturnsToKill;
+        int higherHealth = partyHealths[i];
+        if(bestRatio < betterRatio && highHealth < higherHealth)
+        {
+            swapSlot = i;
+            turnsToDie = newTurnsToDie;
+            turnsToKill = newturnsToKill;
+            bestRatio = betterRatio;
+            highHealth = higherHealth;
+        }
+    }
+    if(swapSlot != activeSlot)
+    {
+        swapCommand(swapSlot, response);
+    }
 }
- */
+*/
 
 bool SwapOrAttack::attackIsNotEffective(string atkElement, string enemyStrElement)
 {

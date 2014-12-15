@@ -572,11 +572,20 @@ string Trainer::makeMove(stringstream& situation)
             cout << response << "\n";
             swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
             cout << response << "\n";
+            /*
+            if(swapOrAttack.allIsNotWell(partyWinOrLose))
+            {
+                swapOrAttack.swapToBestLoser(enemyAttack, enemyCurrentHealth, enemyAtkElement, enemyWeakElement, enemyStrElement, partyAttacks, partyHealths, partyAtkElements, partyWeakElements, partyStrElements, activeSlot, response);
+                cout << response << "\n";
+            }
+             */
         
         if(scrollList[scrollPos] > 0 && predictedAttack < scrollDamage)
         {
             swapOrAttack.useScroll(scrollPos, response);
         }
+        
+        //emergency
     }
     
     //end of battle
@@ -710,12 +719,22 @@ string Trainer::makeMove(stringstream& situation)
                 {
                     if(swapOrAttack.thereisStillHope(partyLastHopes, lastHope))
                     {
+                        //if hope has fainted
                         if(swapOrAttack.isFainted(lastHope, partyHealths))
-                        //i really hope this works!
-                        swapOrAttack.swapToStall(partyHealths, partyStrElements, partyWeakElements, enemyAttack, enemyAtkElement, lastHope, activeSlot, response);
-                        //cout << "IT WORKED!!!!!!!!!!!!!!!!!!!!" << "\n";
+                        {
+                            //rekindle!
+                            swapOrAttack.reviveCommand(lastHope, response);
+                        }
+                        else
+                        {
+                            //i really hope this works!
+                            swapOrAttack.swapToStall(partyHealths, partyStrElements, partyWeakElements, enemyAttack, enemyAtkElement, lastHope, activeSlot, response);
+                            cout << "IT WORKED!!!!!!!!!!!!!!!!!!!!" << "\n";
+
+                        }
+                        cout << "IT WORKED!!!!!!!!!!!!!!!!!!!!" << "\n";
                         
-                        //cout << "Last hope: " << partyNames[lastHope] << "\n";
+                        cout << "Last hope: " << partyNames[lastHope] << "\n";
                     }
                 }
             }
