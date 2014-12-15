@@ -543,7 +543,7 @@ string Trainer::makeMove(stringstream& situation)
     string response = "a";
     
     int predictedAttack = swapOrAttack.getFactoredAttack(partyAttacks[activeSlot], enemyStrElement, enemyWeakElement, partyAtkElements[activeSlot]);
-    int scrollDamage = Item::SCROLL_DAMAGE * swapOrAttack.DOUBLE_FACTOR;
+    int scrollDamage = Item::SCROLL_DAMAGE;
     int scrollPos = CreatureType::TYPES[enemyTypeNum].getElementalWeakness();
     
     //every start of battle, swap
@@ -608,10 +608,11 @@ string Trainer::makeMove(stringstream& situation)
         }
         
         //if active health's is low
-        if(Item::POTION_HEALTH <= partyMaxHealths[activeSlot] - activeHealth)
+        int healthDiff = partyMaxHealths[activeSlot] - activeHealth;
+        if(partyRests[activeSlot] <= healthDiff)
         {
             response = "r";
-            if(itemList[0] > 0 && partyMaxHealths[activeSlot] - activeHealth <= activeRest) //potion
+            if(Item::POTION_HEALTH <= healthDiff && itemList[0] > 0) //potion
             {
                 response = "po";
             }
@@ -626,7 +627,7 @@ string Trainer::makeMove(stringstream& situation)
         //if have collar
         if(itemList[4] > 0)
         {
-            capture.captureCreature(enemyMaxHealth, enemyAttack, partyHealths, partyAttacks, response);
+            capture.captureCreature(enemyMaxHealth, enemyAttack, partyMaxHealths, partyAttacks, response);
         }
     }
     
@@ -782,7 +783,7 @@ string Trainer::makeMove(stringstream& situation)
     char c2 = response[1];
     if(c1 == 's' && (c2 == 'a' || c2 == 'b' || c2 == 'c' || c2 == 'd' || c2 == 'e' || c2 == 'f' || c2 == 'g' || c2 == 'h'))
     {
-        enemyCurrentHealth -= Item::SCROLL_DAMAGE * SwapOrAttack::DOUBLE_FACTOR;
+        enemyCurrentHealth -= Item::SCROLL_DAMAGE;
     }
     
     moveCount++;

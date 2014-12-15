@@ -17,6 +17,7 @@ Creature Creature::factory(int cType, int level_in) {
     Creature c;
     c.setType( cType );
     c.setLevel(level_in);
+    c.xp = level_in*WINS_TO_LEVEL;
     return c;
 }
 
@@ -114,8 +115,8 @@ int Creature::getLevel() {
 
 void Creature::setLevel(int num) {
     level = num;
-    healthMax = getCreatureType().getHealthMaxPerLevel() * level 
-              + getCreatureType().getHealthMaxBase();
+    healthMax = getCreatureType().getHealthMaxPerLevel() * level
+    + getCreatureType().getHealthMaxBase();
     healthCurr = healthMax;
 }
 
@@ -131,8 +132,8 @@ void Creature::setXp(int num) {
 
 bool Creature::operator==(const Creature& other){
     return ( (this->type == other.type) && (this->healthCurr == other.healthCurr) &&
-             (this->healthMax == other.healthMax) && (this->level == other.level) &&
-             (this->xp == other.xp) );
+            (this->healthMax == other.healthMax) && (this->level == other.level) &&
+            (this->xp == other.xp) );
 }
 
 bool Creature::updateXP(){
@@ -156,4 +157,3 @@ bool Creature::updateLevel(){
     }
     return false;
 }
-

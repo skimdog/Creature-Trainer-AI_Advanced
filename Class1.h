@@ -67,7 +67,6 @@ public:
      */
     void swapToWinner(bool partyWinOrLose[], int partyHealths[], int activeSlot, string& response);
     /*
-    /**
      * Requires: Nothing.
      * Modifies: Nothing.
      * Effects:  Assuming there are no winners; swaps to best loser

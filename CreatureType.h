@@ -55,7 +55,12 @@ public:
     const static int attackPerLevelMin = 2;
     const static int attackPerLevelMax = 4;
     
-    
+    //The switch for core/reach
+    //set to false for core
+    //set to true for reach
+    //Be sure to build->clean your solution then recompile
+    //each time you change the flag
+    const static bool REACH_VERSION = true;
     
     /**
      * Requires: Nothing.
@@ -216,7 +221,7 @@ public:
      */
     void setElementalStrength(int);
     
-//--------------Reach----------------
+    //--------------Reach----------------
     /**
      * Requires: Nothing.
      * Modifies: Nothing.
@@ -232,7 +237,7 @@ public:
      */
     void setHealthMaxPerLevel(int num);
     
-
+    
     /**
      * Requires: Nothing.
      * Modifies: Nothing.

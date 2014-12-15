@@ -20,6 +20,7 @@ using namespace std;
 void runBattle(Trainer &player1, Party &party, Item &items, stringstream& ss,
                int winCount, int& moveCount, int& illegalMoveCount){
     
+    
     // generate enemy
     int tNum = EECSRandom::range(0,CreatureType::NUM_TYPES);
     
@@ -27,6 +28,9 @@ void runBattle(Trainer &player1, Party &party, Item &items, stringstream& ss,
     int maxLevel = winCount / 20;
     if(maxLevel >= 9) {
         maxLevel = 9;
+    }
+    if (!CreatureType::REACH_VERSION){
+        maxLevel = 0;
     }
     enemy = Creature::factory( tNum, EECSRandom::range(0, maxLevel + 1) );
     
@@ -86,6 +90,9 @@ void runBattle(Trainer &player1, Party &party, Item &items, stringstream& ss,
         ss << enemy.getTypeName(0) << "! Congratulations!\n";
         
         string newItem = Item::randomItem();
+        if (!CreatureType::REACH_VERSION){
+            newItem = "nothing";
+        }
         if ( newItem.compare("nothing") == 0 ) {
             // You got "nothing"
             ss << "You did not find any items.\n";
@@ -94,13 +101,13 @@ void runBattle(Trainer &player1, Party &party, Item &items, stringstream& ss,
             items.addItem(newItem);
         }
         
-        // Leveling
-        bool levelUp = party.getActiveCreature().updateXP();
-        if(levelUp){
-            int health = party.getActiveCreature().getHealthCurr();
-            ss << party.getActiveCreature().getTypeName() << " grows to level "
-            << party.getActiveCreature().getLevel() << " and regains full "
-            << health << "/" << health << " health!!!\n\n";
+        if (CreatureType::REACH_VERSION){
+            // Leveling
+            bool levelUp = party.getActiveCreature().updateXP();
+            if (levelUp){
+                ss << party.getActiveCreature().getTypeName() << " grows to level "
+                << party.getActiveCreature().getLevel() << "!!!\n\n";
+            }
         }
         
         PrintHelper::printHR(ss);
@@ -146,7 +153,7 @@ void parseMove(string playerMove, Party &party, Item &items, Creature& enemy,
     switch (playerMove[0]){
         case 'a': { // Attack
             if (playerMove.length()>1) { // This is an AtkBst(ab)
-                                         // Tell the item function to manage this
+                // Tell the item function to manage this
                 items.useItem(playerMove, party, enemy, ss, illegalMoveCount);
                 break;
             }
@@ -158,7 +165,7 @@ void parseMove(string playerMove, Party &party, Item &items, Creature& enemy,
         }
             
         case 's': { // Swap for another party member
-                    // You cannot swap to a fainted party member
+            // You cannot swap to a fainted party member
             if (playerMove.length() < 2) {
                 PrintHelper::printError(ss);
                 illegalMoveCount++;
@@ -239,7 +246,7 @@ void parseMovePostBattle(string playerMove, Party &party, Item &items, Creature&
     switch (playerMove[0]){
         case 'a': { // Attack not allowed, but Attack boost is
             if (playerMove.length()>1) { // This is an AtkBst(ab)
-                                         // Tell the item function to manage this
+                // Tell the item function to manage this
                 items.useItem(playerMove, party, enemy, ss, illegalMoveCount);
                 break;
             }
@@ -250,7 +257,7 @@ void parseMovePostBattle(string playerMove, Party &party, Item &items, Creature&
         }
             
         case 's': { // Swap for another party member
-                    // You cannot swap to a fainted party member
+            // You cannot swap to a fainted party member
             if (playerMove.length() < 2) {
                 PrintHelper::printError(ss);
                 illegalMoveCount++;
@@ -315,7 +322,6 @@ void parseMovePostBattle(string playerMove, Party &party, Item &items, Creature&
             break;
         }
     }
-    
 }
 
 

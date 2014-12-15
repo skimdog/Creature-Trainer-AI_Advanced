@@ -20,9 +20,10 @@ public:
     const static int    NUM_ITEMS = 13;
     const static int    MAX_ITEM_COUNT = 99;
     const static int    BOOST_TURNS = 4;
-    const static int    POTION_HEALTH = 10;
-    const static int    SCROLL_DAMAGE = 10;
+    const static int    POTION_HEALTH = 20;
+    const static int    SCROLL_DAMAGE = 20;
     const static int    REVIVE_HEALTH = 1;
+    const static int    COLLAR_HEALTH = 1;
     // Below is the damage multiplier that the two Boosts apply
     // constexpr const static double ATKBST_MULT = 2.0;
     //constexpr const static double DEFBST_MULT = 0.5;
@@ -47,7 +48,6 @@ public:
     const static string ITEM_CODES[];
     const static int    ITEM_CHANCE[];
     const static int    NOTHING_CHANCE = 25;
-    
     
     
     /**
