@@ -542,16 +542,15 @@ string Trainer::makeMove(stringstream& situation)
     //default response = attack
     string response = "a";
     
+    int predictedAttack = swapOrAttack.getFactoredAttack(partyAttacks[activeSlot], enemyStrElement, enemyWeakElement, partyAtkElements[activeSlot]);
+    int scrollDamage = Item::SCROLL_DAMAGE * swapOrAttack.DOUBLE_FACTOR;
+    int scrollPos = CreatureType::TYPES[enemyTypeNum].getElementalWeakness();
+    
     //every start of battle, swap
     if (isStartofBattle)
     {
-        //predicted active creature attack
-        int predictedAttack = swapOrAttack.getFactoredAttack(partyAttacks[activeSlot], enemyStrElement, enemyWeakElement, partyAtkElements[activeSlot]);
-        int scrollDamage = Item::SCROLL_DAMAGE * swapOrAttack.DOUBLE_FACTOR;
-        int scrollPos = CreatureType::TYPES[enemyTypeNum].getElementalWeakness();
-
         //if active creature can take this
-        if(partyWinOrLose[activeSlot])
+        if(enemyCurrentHealth <= predictedAttack || partyWinOrLose[activeSlot])
         {
             canFinishOff = true;
         }
@@ -625,9 +624,17 @@ string Trainer::makeMove(stringstream& situation)
     //during battle
     else if(!isStartofBattle && !isEndofBattle)
     {
-        int predictedAttack = swapOrAttack.getFactoredAttack(partyAttacks[activeSlot], enemyStrElement, enemyWeakElement, partyAtkElements[activeSlot]);
-        int scrollDamage = Item::SCROLL_DAMAGE * swapOrAttack.DOUBLE_FACTOR;
-        int scrollPos = CreatureType::TYPES[enemyTypeNum].getElementalWeakness();
+        //if active creature can take this
+        if(enemyCurrentHealth <= predictedAttack || partyWinOrLose[activeSlot])
+        {
+            canFinishOff = true;
+        }
+        
+        //determine whether scroll can finish off enemy
+        if(scrollList[scrollPos] > 0 && enemyCurrentHealth <= scrollDamage)
+        {
+            canScrollOff = true;
+        }
         
         //if active creature will not faint next turn
         if (!swapOrAttack.isGonnaDie(activeHealth, activeStrElement, activeWeakElement, enemyAttack, enemyAtkElement))
@@ -729,22 +736,18 @@ string Trainer::makeMove(stringstream& situation)
             
             swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
         }
-        
-        //if active creature can take this
-        if(partyWinOrLose[activeSlot] && swapOrAttack.isFainted(activeSlot, partyHealths))
-        {
-            canFinishOff = true;
-        }
-        
-        //determine whether scroll can finish off enemy
-        if(scrollList[scrollPos] > 0 && enemyCurrentHealth <= scrollDamage)
-        {
-            canScrollOff = true;
-        }
     }
     if(canFinishOff)
     {
         response = "a";
+        if(canScrollOff && predictedAttack < scrollDamage)
+        {
+            swapOrAttack.useScroll(scrollPos, response);
+        }
+    }
+    else if(canScrollOff)
+    {
+        swapOrAttack.useScroll(scrollPos, response);
     }
     
     //if final response is attack
@@ -754,6 +757,7 @@ string Trainer::makeMove(stringstream& situation)
         enemyCurrentHealth -= swapOrAttack.getFactoredAttack(activeAttack, enemyStrElement, enemyWeakElement, activeAtkElement);
     }
     
+    //if final response is scroll
     //determine whether scroll has been used, in order to update enemy's current health
     char c1 = response[0];
     char c2 = response[1];
