@@ -319,7 +319,6 @@ string Trainer::makeMove(stringstream& situation)
     //FIND LINE WITH "ENEMY"
     string enemyAttackLine;
     stringstream enemySS;
-    //const int NUM_OF_SKIPS = 8; //number of words to skip before attack damage is read
     
     for (int i = 0; i < lines.size(); i++)
     {
@@ -345,7 +344,7 @@ string Trainer::makeMove(stringstream& situation)
         vector<string> enemyNameLevelLine = splitString(newBattleLine, " ");
         enemyName_Level = enemyNameLevelLine[3];
     }
-    else if(!isEndofBattle) //during battle
+    else //during battle
     {
         //"Enemy **** attacks..."
         vector<string> enemyNameLevelLine = splitString(enemyAttackLine, " ");
@@ -572,7 +571,9 @@ string Trainer::makeMove(stringstream& situation)
             //cout << response << "\n";
             swapOrAttack.swapToDefensive(enemyAtkElement, enemyStrElement, partyAtkElements, partyStrElements, partyHealths, activeSlot, response);
             //cout << response << "\n";
-            swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
+            //swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
+            //cout << response << "\n";
+            swapOrAttack.swapToWeakWinner(partyWinOrLose, partyLevels, activeSlot, response);
             //cout << response << "\n";
             /*
             if(swapOrAttack.allIsNotWell(partyWinOrLose))
@@ -682,7 +683,9 @@ string Trainer::makeMove(stringstream& situation)
             
             swapOrAttack.swapToDefensive(enemyAtkElement, enemyStrElement, partyAtkElements, partyStrElements, partyHealths, activeSlot, response);
             
-            swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
+            //swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
+            swapOrAttack.swapToWeakWinner(partyWinOrLose, partyLevels, activeSlot, response);
+            //cout << response << "\n";
             
             //sole survivor
             if(swapOrAttack.isLastCreatureStanding(partyHealths, activeSlot))
@@ -770,7 +773,9 @@ string Trainer::makeMove(stringstream& situation)
             
             swapOrAttack.swapToDefensive(enemyAtkElement, enemyStrElement, partyAtkElements, partyStrElements, partyHealths, activeSlot, response);
             
-            swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
+            //swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
+            swapOrAttack.swapToWeakWinner(partyWinOrLose, partyLevels, activeSlot, response);
+            //cout << response << "\n";
         }
     }
     /* at end of decision loop,

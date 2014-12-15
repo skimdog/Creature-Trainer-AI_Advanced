@@ -164,6 +164,25 @@ void SwapOrAttack::swapToWinner(bool partyWinOrLose[], int partyHealths[], int a
         swapCommand(swapSlot, response);
     }
 }
+
+void SwapOrAttack::swapToWeakWinner(bool partyWinOrLose[], int partyLevels[], int activeSlot, string& response)
+{
+    int swapSlot = 0;
+    int level = 10;
+    for(int i = 1; i < PARTY_SIZE; i++)
+    {
+        int lowerLevel = partyLevels[i];
+        if(partyWinOrLose[i] && level > lowerLevel)
+        {
+            swapSlot = i;
+            level = lowerLevel;
+        }
+    }
+    if(swapSlot != activeSlot)
+    {
+        swapCommand(swapSlot, response);
+    }
+}
 /*
 void SwapOrAttack::swapToBestLoser(int enemyAttack, int enemyCurrentHealth, string enemyAtkElement, string enemyWeakElement, string enemyStrElement, int partyAttacks[], int partyHealths[], string partyAtkElements[], string partyWeakElements[], string partyStrElements[], int activeSlot, string& response)
 {
