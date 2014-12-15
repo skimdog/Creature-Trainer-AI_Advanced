@@ -26,6 +26,9 @@
 
 using namespace std;
 
+//to count moves
+static int moveCount = 0;
+
 string Trainer::makeMove(stringstream& situation)
 {
     //default
@@ -547,18 +550,6 @@ string Trainer::makeMove(stringstream& situation)
         int scrollDamage = Item::SCROLL_DAMAGE * swapOrAttack.DOUBLE_FACTOR;
         int scrollPos = CreatureType::TYPES[enemyTypeNum].getElementalWeakness();
 
-            //swapping decisions
-            swapOrAttack.swapToHighestHealth(partyHealths, partyAttacks, activeSlot, response);
-            cout << response << "\n";
-            swapOrAttack.swapToNormal(enemyAtkElement, enemyStrElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
-            cout << response << "\n";
-            swapOrAttack.swapToOffensive(enemyAtkElement, enemyWeakElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
-            cout << response << "\n";
-            swapOrAttack.swapToDefensive(enemyAtkElement, enemyStrElement, partyAtkElements, partyStrElements, partyHealths, activeSlot, response);
-            cout << response << "\n";
-            swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
-            cout << response << "\n";
-        
         //if active creature can take this
         if(partyWinOrLose[activeSlot])
         {
@@ -570,6 +561,18 @@ string Trainer::makeMove(stringstream& situation)
         {
             canScrollOff = true;
         }
+
+            //swapping decisions
+            swapOrAttack.swapToHighestHealth(partyHealths, partyAttacks, activeSlot, response);
+            cout << response << "\n";
+            swapOrAttack.swapToNormal(enemyAtkElement, enemyStrElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
+            cout << response << "\n";
+            swapOrAttack.swapToOffensive(enemyAtkElement, enemyWeakElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
+            cout << response << "\n";
+            swapOrAttack.swapToDefensive(enemyAtkElement, enemyStrElement, partyAtkElements, partyStrElements, partyHealths, activeSlot, response);
+            cout << response << "\n";
+            swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
+            cout << response << "\n";
         
         if(scrollList[scrollPos] > 0 && predictedAttack < scrollDamage)
         {
@@ -597,10 +600,10 @@ string Trainer::makeMove(stringstream& situation)
         }
         
         //if active health's is low
-        if(Item::POTION_HEALTH <= activeMaxHealth - activeHealth)
+        if(Item::POTION_HEALTH <= partyMaxHealths[activeSlot] - activeHealth)
         {
             response = "r";
-            if(itemList[0] > 0 && activeMaxHealth - activeHealth <= activeRest) //potion
+            if(itemList[0] > 0 && partyMaxHealths[activeSlot] - activeHealth <= activeRest) //potion
             {
                 response = "po";
             }
@@ -759,6 +762,8 @@ string Trainer::makeMove(stringstream& situation)
         enemyCurrentHealth -= Item::SCROLL_DAMAGE * SwapOrAttack::DOUBLE_FACTOR;
     }
     
+    moveCount++;
+    cout << "# of moves: " << moveCount << "\n";
     return response;
 }
 
