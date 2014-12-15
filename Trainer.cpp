@@ -34,10 +34,10 @@ string Trainer::makeMove(stringstream& situation)
     //default
     isStartofBattle = false;
     isEndofBattle   = false;
-    atkBst_InPlay   = false;
-    defBst_InPlay   = false;
-    canFinishOff    = false;
-    canScrollOff    = false;
+    atkBst_InPlay   = false; //tells whether atkBst is being used
+    defBst_InPlay   = false; //tells whether defBst is being used
+    canFinishOff    = false; //will explain later
+    canScrollOff    = false; //will explain later
     
     //ParseHelp parseHelp; //make parsing easier!
     
@@ -132,7 +132,7 @@ string Trainer::makeMove(stringstream& situation)
     }
     
     // * DETERMINES WHETHER AtkBst OR DefBst IS IN PLAY *
-    
+    //below will parse and determine whether either atkbst or defbst items are being used
     string boostline;
     
     for(int i = 0; i < lines.size(); i++)
@@ -276,13 +276,13 @@ string Trainer::makeMove(stringstream& situation)
         
         partyAttacks[i] = attack;
         
-        //STORE REST INCREASE
+        //STORE REST INCREASE //Store party's rests' health increases
         int rest;
         rest = CreatureType::TYPES[typeNum].getHealthRestIncrease();
         partyRests[i] = rest;
         
         
-        //STORE MAX HEALTH, just in case!
+        //STORE MAX HEALTH //Store party's max healths
         int maxHealthBase = CreatureType::TYPES[typeNum].getHealthMaxBase();
         int maxHealth = maxHealthBase + (CreatureType::TYPES[typeNum].getHealthMaxPerLevel() * level);
         partyMaxHealths[i] = maxHealth;
@@ -392,7 +392,7 @@ string Trainer::makeMove(stringstream& situation)
     enemyMaxHealthBase = CreatureType::TYPES[enemyTypeNum].getHealthMaxBase();
     enemyMaxHealth = enemyMaxHealthBase + (CreatureType::TYPES[enemyTypeNum].getHealthMaxPerLevel() * enemyLevel);
 
-    //first calculate enemyMaxHealth into enemyCurrentHealth to keep track during battle
+     //first calculate enemyMaxHealth into enemyCurrentHealth to keep track during battle
     if(isStartofBattle)
     {
         enemyCurrentHealth = enemyMaxHealth;
@@ -417,8 +417,8 @@ string Trainer::makeMove(stringstream& situation)
     enemyStrElement = CreatureType::elementName(strElement_Num, 0);
     
     
-    // * STORE PARTY RATIOS OF TURNS TO KILL : TURNS TO DIE *
-    
+     // * STORE PARTY RATIOS OF TURNS TO KILL : TURNS TO DIE *
+    //below stores bools of whether each creature can win against enemy
     if(!isEndofBattle)
     {
         SwapOrAttack ratios;
@@ -548,19 +548,21 @@ string Trainer::makeMove(stringstream& situation)
     
     //every start of battle, swap
     if (isStartofBattle)
-    {
+    {   //canFinishOff will be true when the active creature can either finish enemy this turn or any turn by itself without swapping/dying
+        //HIGH PRIORITY, WILL OVERRIDE ALL RESPONSES
         //if active creature can take this
         if(enemyCurrentHealth <= predictedAttack || partyWinOrLose[activeSlot])
         {
             canFinishOff = true;
         }
-        
+        //like canFinishOff, canScrollOff will be true when scroll(if any)can finish enemy this turn (both these bools are included way below, in other parts of loop)
         //determine whether scroll can finish off enemy
+        //HIGH PRIORITY, WILL OVERRIDE ALL RESPONSES
         if(scrollList[scrollPos] > 0 && enemyCurrentHealth <= scrollDamage)
         {
             canScrollOff = true;
         }
-
+            //below are swap functions, the response will change or not as it goes down one by one (bottom are prioritized)
             //swapping decisions
             swapOrAttack.swapToHighestHealth(partyHealths, partyAttacks, activeSlot, response);
             cout << response << "\n";
@@ -579,7 +581,7 @@ string Trainer::makeMove(stringstream& situation)
                 cout << response << "\n";
             }
              */
-        
+        //this is just regular scroll response, whether canScrollOff is true or not
         if(scrollList[scrollPos] > 0 && predictedAttack < scrollDamage)
         {
             swapOrAttack.useScroll(scrollPos, response);
@@ -715,7 +717,20 @@ string Trainer::makeMove(stringstream& situation)
                     }
                 }
                 
-                //in-progress LAST-HOPE STRATEGY TO END INFINITE SWAPPING!!!
+                 //(in-progress) LAST-HOPE STRATEGY TO END INFINITE SWAPPING!!!
+                /* ONLY WORKS IF AT LEAST ONE IN PARTY CAN DEFEAT ENEMY WHEN AT [FULL HEALTH - 1 x enemyAttack] (since enemy will always attack the swapped creature)
+                    When each is party is not at Max Health and cannot defeat enemy singlehandedly,
+                    find in the party at least one that can defeat enemy when at "full health".
+                    if there is, and it fainted, revive it immediately
+                    once it's alive, swap to any creature(that won't die when swapped) other than that "last Hope" creature or active creature.
+                    each turn, will automatically keep swapping until "last hope is at full health".
+                    Once it does, it will hopefully update the partyWinOrLose bool array,
+                    which stores each creature's true/false of defeating the enemy without dying.
+                    And the decision loop will normally swap to that creature.
+                    If, however, it still cannot win, or if none can win even at "full health" in the
+                    first place, the decision loop will run as it is.
+                    Still does not fix the occasional infinite swapping (i'll keep looking into that).
+                 */
                 if(swapOrAttack.allIsNotWell(partyWinOrLose))
                 {
                     if(swapOrAttack.thereisStillHope(partyLastHopes, lastHope))
@@ -730,12 +745,11 @@ string Trainer::makeMove(stringstream& situation)
                         {
                             //i really hope this works!
                             swapOrAttack.swapToStall(partyHealths, partyStrElements, partyWeakElements, enemyAttack, enemyAtkElement, lastHope, activeSlot, response);
-                            cout << "IT WORKED!!!!!!!!!!!!!!!!!!!!" << "\n";
-
+                            //cout << "IT WORKED!!!!!!!!!!!!!!!!!!!!" << "\n";
                         }
-                        cout << "IT WORKED!!!!!!!!!!!!!!!!!!!!" << "\n";
+                        //cout << "IT WORKED!!!!!!!!!!!!!!!!!!!!" << "\n";
                         
-                        cout << "Last hope: " << partyNames[lastHope] << "\n";
+                        //cout << "Last hope: " << partyNames[lastHope] << "\n";
                     }
                 }
             }
@@ -757,6 +771,10 @@ string Trainer::makeMove(stringstream& situation)
             swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
         }
     }
+    /* at end of decision loop,
+        if either/both canFinishOff or canScrollOff are true,
+        response will automatically be either attack/scroll
+     */
     if(canFinishOff)
     {
         response = "a";
