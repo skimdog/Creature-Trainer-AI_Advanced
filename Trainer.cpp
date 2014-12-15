@@ -27,7 +27,7 @@
 using namespace std;
 
 //to count moves
-static int moveCount = 0;
+//static int moveCount = 0;
 
 string Trainer::makeMove(stringstream& situation)
 {
@@ -565,15 +565,15 @@ string Trainer::makeMove(stringstream& situation)
             //below are swap functions, the response will change or not as it goes down one by one (bottom are prioritized)
             //swapping decisions
             swapOrAttack.swapToHighestHealth(partyHealths, partyAttacks, activeSlot, response);
-            cout << response << "\n";
+            //cout << response << "\n";
             swapOrAttack.swapToNormal(enemyAtkElement, enemyStrElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
-            cout << response << "\n";
+            //cout << response << "\n";
             swapOrAttack.swapToOffensive(enemyAtkElement, enemyWeakElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
-            cout << response << "\n";
+            //cout << response << "\n";
             swapOrAttack.swapToDefensive(enemyAtkElement, enemyStrElement, partyAtkElements, partyStrElements, partyHealths, activeSlot, response);
-            cout << response << "\n";
+            //cout << response << "\n";
             swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
-            cout << response << "\n";
+            //cout << response << "\n";
             /*
             if(swapOrAttack.allIsNotWell(partyWinOrLose))
             {
@@ -731,6 +731,7 @@ string Trainer::makeMove(stringstream& situation)
                     first place, the decision loop will run as it is.
                     Still does not fix the occasional infinite swapping (i'll keep looking into that).
                  */
+                /*
                 if(swapOrAttack.allIsNotWell(partyWinOrLose))
                 {
                     if(swapOrAttack.thereisStillHope(partyLastHopes, lastHope))
@@ -752,6 +753,7 @@ string Trainer::makeMove(stringstream& situation)
                         //cout << "Last hope: " << partyNames[lastHope] << "\n";
                     }
                 }
+                 */
             }
         }
         
@@ -804,8 +806,8 @@ string Trainer::makeMove(stringstream& situation)
         enemyCurrentHealth -= Item::SCROLL_DAMAGE;
     }
     
-    moveCount++;
-    cout << "# of moves: " << moveCount << "\n";
+    //moveCount++;
+    //cout << "# of moves: " << moveCount << "\n";
     return response;
 }
 
