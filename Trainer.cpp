@@ -565,23 +565,17 @@ string Trainer::makeMove(stringstream& situation)
             //swapping decisions
             swapOrAttack.swapToHighestHealth(partyHealths, partyAttacks, activeSlot, response);
             //cout << response << "\n";
-            swapOrAttack.swapToNormal(enemyAtkElement, enemyStrElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
-            //cout << response << "\n";
-            swapOrAttack.swapToOffensive(enemyAtkElement, enemyWeakElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
-            //cout << response << "\n";
-            swapOrAttack.swapToDefensive(enemyAtkElement, enemyStrElement, partyAtkElements, partyStrElements, partyHealths, activeSlot, response);
-            //cout << response << "\n";
-            //swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
-            //cout << response << "\n";
-            swapOrAttack.swapToWeakWinner(partyWinOrLose, partyLevels, activeSlot, response);
-            //cout << response << "\n";
-            /*
-            if(swapOrAttack.allIsNotWell(partyWinOrLose))
+            if(!swapOrAttack.allIsNotWell(partyWinOrLose))
             {
-                swapOrAttack.swapToBestLoser(enemyAttack, enemyCurrentHealth, enemyAtkElement, enemyWeakElement, enemyStrElement, partyAttacks, partyHealths, partyAtkElements, partyWeakElements, partyStrElements, activeSlot, response);
-                cout << response << "\n";
+                swapOrAttack.swapToNormal(enemyAtkElement, enemyStrElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
+            
+                swapOrAttack.swapToOffensive(enemyAtkElement, enemyWeakElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
+            
+                swapOrAttack.swapToDefensive(enemyAtkElement, enemyStrElement, partyAtkElements, partyStrElements, partyHealths, activeSlot, response);
+                //swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
+                swapOrAttack.swapToWeakWinner(partyWinOrLose, partyLevels, activeSlot, response);
             }
-             */
+        
         //this is just regular scroll response, whether canScrollOff is true or not
         if(scrollList[scrollPos] > 0 && predictedAttack < scrollDamage)
         {
@@ -676,16 +670,25 @@ string Trainer::makeMove(stringstream& situation)
         else if(!swapOrAttack.isFainted(activeSlot, partyHealths) && swapOrAttack.isGonnaDie(activeHealth, activeStrElement, activeWeakElement, enemyAttack, enemyAtkElement))
         {
             swapOrAttack.swapToHighestHealth(partyHealths, partyAttacks, activeSlot, response);
-            
+            /*
             swapOrAttack.swapToNormal(enemyAtkElement, enemyStrElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
             
             swapOrAttack.swapToOffensive(enemyAtkElement, enemyWeakElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
             
             swapOrAttack.swapToDefensive(enemyAtkElement, enemyStrElement, partyAtkElements, partyStrElements, partyHealths, activeSlot, response);
-            
             //swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
             swapOrAttack.swapToWeakWinner(partyWinOrLose, partyLevels, activeSlot, response);
-            //cout << response << "\n";
+            */
+            if(!swapOrAttack.allIsNotWell(partyWinOrLose))
+            {
+                swapOrAttack.swapToNormal(enemyAtkElement, enemyStrElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
+                
+                swapOrAttack.swapToOffensive(enemyAtkElement, enemyWeakElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
+                
+                swapOrAttack.swapToDefensive(enemyAtkElement, enemyStrElement, partyAtkElements, partyStrElements, partyHealths, activeSlot, response);
+                //swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
+                swapOrAttack.swapToWeakWinner(partyWinOrLose, partyLevels, activeSlot, response);
+            }
             
             //sole survivor
             if(swapOrAttack.isLastCreatureStanding(partyHealths, activeSlot))
@@ -766,7 +769,7 @@ string Trainer::makeMove(stringstream& situation)
             canFinishOff = false;
             
             swapOrAttack.swapToHighestHealth(partyHealths, partyAttacks, activeSlot, response);
-            
+            /*
             swapOrAttack.swapToNormal(enemyAtkElement, enemyStrElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
             
             swapOrAttack.swapToOffensive(enemyAtkElement, enemyWeakElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
@@ -776,6 +779,17 @@ string Trainer::makeMove(stringstream& situation)
             //swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
             swapOrAttack.swapToWeakWinner(partyWinOrLose, partyLevels, activeSlot, response);
             //cout << response << "\n";
+            */
+            if(!swapOrAttack.allIsNotWell(partyWinOrLose))
+            {
+                swapOrAttack.swapToNormal(enemyAtkElement, enemyStrElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
+                
+                swapOrAttack.swapToOffensive(enemyAtkElement, enemyWeakElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
+                
+                swapOrAttack.swapToDefensive(enemyAtkElement, enemyStrElement, partyAtkElements, partyStrElements, partyHealths, activeSlot, response);
+                //swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
+                swapOrAttack.swapToWeakWinner(partyWinOrLose, partyLevels, activeSlot, response);
+            }
         }
     }
     /* at end of decision loop,

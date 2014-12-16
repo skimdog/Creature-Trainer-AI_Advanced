@@ -73,13 +73,7 @@ public:
      * Effects:  If any, swaps to the lowest-level creature that will win 100%
      */
     void swapToWeakWinner(bool partyWinOrLose[], int partyLevels[], int activeSlot, string& response);
-    /*
-     * Requires: Nothing.
-     * Modifies: Nothing.
-     * Effects:  Assuming there are no winners; swaps to best loser
-     
-    void swapToBestLoser(int enemyAttack, int enemyCurrentHealth, string enemyAtkElement, string enemyWeakElement, string enemyStrElement, int partyAttacks[], int partyHealths[], string partyAtkElements[], string partyWeakElements[], string partyStrElements[], int activeSlot, string& response);
-    */
+
     /**
      * Requires: Nothing.
      * Modifies: Nothing.
