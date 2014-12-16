@@ -406,31 +406,3 @@ bool SwapOrAttack::calculateWinLose(int enemyAttack, string enemyAtkElement, str
         return false;
     }
 }
-
-bool SwapOrAttack::thereisStillHope(bool partyLastHopes[], int& hopeSlot)
-{
-    for(int i = 1; i < PARTY_SIZE; i++)
-    {
-        if(partyLastHopes[i])
-        {
-            hopeSlot = i;
-            return true;
-        }
-    }
-    return false;
-}
-
-void SwapOrAttack::swapToStall(int partyHealths[], string partyStrElements[], string partyWeakElements[], int enemyAttack, string enemyAtkElement, int hopeSlot, int activeSlot, string& response)
-{
-    for(int i = 1; i < PARTY_SIZE; i++)
-    {
-        if(i != activeSlot && i != hopeSlot && isFainted(i, partyHealths))
-        {
-            if(!isGonnaDie(partyHealths[i], partyStrElements[i], partyWeakElements[i], enemyAttack, enemyAtkElement))
-            {
-                swapCommand(i, response);
-                break;
-            }
-        }
-    }
-}

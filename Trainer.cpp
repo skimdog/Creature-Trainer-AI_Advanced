@@ -26,8 +26,6 @@
 
 using namespace std;
 
-//to count moves
-//static int moveCount = 0;
 
 string Trainer::makeMove(stringstream& situation)
 {
@@ -47,10 +45,7 @@ string Trainer::makeMove(stringstream& situation)
     
     // Here's how to use the stringSplit function
     vector<string> lines = splitString(situationString, "\n");
-    // This splits situationString into a vector of individual lines.
-    // (it splits on the new line character "\n")
-    // To access the 3rd line (as in 0, 1, 2, 3), you would use bracket access
-    //   as in: lines[3]
+    
     
     // This loop will iterate through all the lines
     int pipeLine = -1;
@@ -68,9 +63,6 @@ string Trainer::makeMove(stringstream& situation)
             pipeLine = i;
         }
     }
-    // Now that we know which line has the health, do something with it
-    //cout << lines[pipeLine] << "\n"; // Output for testing only
-    
     
     // * DETERMINES WHETHER NEW BATTLE HAS STARTED *
     string newBattleLine;
@@ -94,18 +86,6 @@ string Trainer::makeMove(stringstream& situation)
     
     // Split the party health line by pipes "|"
     vector<string> creatureHealthBits = splitString(lines[pipeLine], "|");
-    // This gives us something like the vector description below
-    /* { "",
-     " *Jackal     10/10",
-     " Yaminon    17/17",
-     " Megapode   13/13",
-     " Jackal     10/10",
-     "" } */
-    // You can see that the first and last pipe caused empty strings
-    
-    // Now, go through this information and pull out info for each entry
-    // We do 1 to <creatureHealthBits.size()-1 because we only need the middle
-    //    four elements (and are skipping the empty ones.
     
     
 // * DETERMINE IF BATTLE HAS ENDED *
@@ -428,11 +408,6 @@ string Trainer::makeMove(stringstream& situation)
             bool canWin = ratios.calculateWinLose(enemyAttack, enemyAtkElement, enemyWeakElement, enemyStrElement, enemyCurrentHealth, partyAttacks, partyAtkElements, partyWeakElements, partyStrElements, partyHealths, i, activeSlot, false);
             
             partyWinOrLose[i] = canWin;
-            
-            //used for last-resort strategy
-            bool hope = ratios.calculateWinLose(enemyAttack, enemyAtkElement, enemyWeakElement, enemyStrElement, enemyCurrentHealth, partyAttacks, partyAtkElements, partyWeakElements, partyStrElements, partyMaxHealths, i, activeSlot, true);
-            
-            partyLastHopes[i] = hope;
         }
     }
     //default
@@ -477,9 +452,6 @@ string Trainer::makeMove(stringstream& situation)
             itemSS >> colon;
         }
         itemSS >> itemList[i - 1]; //# of certain item
-        
-        //testing
-        //cout << "Item #" << i << ": " << itemList[i - 1] << "\n";
     }
     
     //parsing in second line of scrolls
@@ -503,36 +475,36 @@ string Trainer::makeMove(stringstream& situation)
         //cout << "Scroll #" << i << ": " << scrollList[i - 2] << "\n";
     }
     cout << situationString;
+    
+    /*
+    cout << "\n";
+    cout << "\n";
+    cout << "\n";
+    cout << "Enemy name: " << enemyName << " | Health: " << enemyCurrentHealth << "/" << enemyMaxHealth << " | Level: " << enemyLevel << " | Attack: " << enemyAttack << "\n";
+    cout << "AtkElement: " << enemyAtkElement << " | WeakElement: " << enemyWeakElement << " | StrElements: "<< enemyStrElement << "\n";
+    
+    cout << "\n";
+    for (int i = 1; i < PARTY_SIZE; i++)
+    {
+        cout << "\n";
+        cout << "Name: ";
+        if(i == activeSlot)
+        {
+            cout << "*";
+        }
+        cout << partyNames[i] << " | Health: " << partyHealths[i] << "/" << partyMaxHealths[i] << " | Level: " << partyLevels[i] << " | Attack: " << partyAttacks[i] << " | Rest: " << partyRests[i] << "\n";
+        cout << "AtkElement: " << partyAtkElements[i] << " | WeakElement: " << partyWeakElements[i] << " | StrElements: "<< partyStrElements[i] << "\n";
+        if(partyWinOrLose[i])
+        {
+            cout << "Winner! \n";
+        }
+        else
+        {
+            cout << "Loser \n";
+        }
+    }
+    */
 
-    /**///testing
-    /**/cout << "\n";
-    /**/cout << "\n";
-    /**/cout << "\n";
-    /**/cout << "Enemy name: " << enemyName << " | Health: " << enemyCurrentHealth << "/" << enemyMaxHealth << " | Level: " << enemyLevel << " | Attack: " << enemyAttack << "\n";
-    /**/cout << "AtkElement: " << enemyAtkElement << " | WeakElement: " << enemyWeakElement << " | StrElements: "<< enemyStrElement << "\n";
-    
-    /**/cout << "\n";
-    /**/for (int i = 1; i < PARTY_SIZE; i++)
-    /**/{
-    /**/    cout << "\n";
-    /**/    cout << "Name: ";
-            if(i == activeSlot)
-            {
-                cout << "*";
-            }
-            cout << partyNames[i] << " | Health: " << partyHealths[i] << "/" << partyMaxHealths[i] << " | Level: " << partyLevels[i] << " | Attack: " << partyAttacks[i] << " | Rest: " << partyRests[i] << "\n";
-    /**/    cout << "AtkElement: " << partyAtkElements[i] << " | WeakElement: " << partyWeakElements[i] << " | StrElements: "<< partyStrElements[i] << "\n";
-            if(partyWinOrLose[i])
-            {
-                cout << "Winner! \n";
-            }
-            else
-            {
-                cout << "Loser \n";
-            }
-        /**/}
-    
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //THE DECISION BEGINS HERE!!!
     SwapOrAttack swapOrAttack;
     Capture capture;
@@ -547,24 +519,22 @@ string Trainer::makeMove(stringstream& situation)
     
     //every start of battle, swap
     if (isStartofBattle)
-    {   //canFinishOff will be true when the active creature can either finish enemy this turn or any turn by itself without swapping/dying
-        //HIGH PRIORITY, WILL OVERRIDE ALL RESPONSES
+    {
         //if active creature can take this
         if(enemyCurrentHealth <= predictedAttack || partyWinOrLose[activeSlot])
         {
             canFinishOff = true;
         }
-        //like canFinishOff, canScrollOff will be true when scroll(if any)can finish enemy this turn (both these bools are included way below, in other parts of loop)
+    
         //determine whether scroll can finish off enemy
-        //HIGH PRIORITY, WILL OVERRIDE ALL RESPONSES
         if(scrollList[scrollPos] > 0 && enemyCurrentHealth <= scrollDamage)
         {
             canScrollOff = true;
         }
-            //below are swap functions, the response will change or not as it goes down one by one (bottom are prioritized)
+        
             //swapping decisions
             swapOrAttack.swapToHighestHealth(partyHealths, partyAttacks, activeSlot, response);
-            //cout << response << "\n";
+        
             if(!swapOrAttack.allIsNotWell(partyWinOrLose))
             {
                 swapOrAttack.swapToNormal(enemyAtkElement, enemyStrElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
@@ -572,7 +542,7 @@ string Trainer::makeMove(stringstream& situation)
                 swapOrAttack.swapToOffensive(enemyAtkElement, enemyWeakElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
             
                 swapOrAttack.swapToDefensive(enemyAtkElement, enemyStrElement, partyAtkElements, partyStrElements, partyHealths, activeSlot, response);
-                //swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
+                
                 swapOrAttack.swapToWeakWinner(partyWinOrLose, partyLevels, activeSlot, response);
             }
         
@@ -581,8 +551,6 @@ string Trainer::makeMove(stringstream& situation)
         {
             swapOrAttack.useScroll(scrollPos, response);
         }
-        
-        //emergency
     }
     
     //end of battle
@@ -621,7 +589,7 @@ string Trainer::makeMove(stringstream& situation)
             swapOrAttack.reviveMostUsefulCreature(partyHealths, partyAttacks, response);
         }
         
-        //if have collar
+        //collar
         if(itemList[4] > 0)
         {
             capture.captureCreature(enemyMaxHealth, enemyAttack, partyMaxHealths, partyAttacks, response);
@@ -654,12 +622,15 @@ string Trainer::makeMove(stringstream& situation)
                 swapOrAttack.useScroll(scrollPos, response);
             }
             
+            //if entire party doesn't stand a chance
             if(!partyWinOrLose[activeSlot])
             {
+                //atkbst
                 if(itemList[2] > 0)
                 {
                     response = "ab";
                 }
+                //defbst
                 if(itemList[1] > 0)
                 {
                     response = "db";
@@ -669,16 +640,9 @@ string Trainer::makeMove(stringstream& situation)
         //if active creature will faint next turn
         else if(!swapOrAttack.isFainted(activeSlot, partyHealths) && swapOrAttack.isGonnaDie(activeHealth, activeStrElement, activeWeakElement, enemyAttack, enemyAtkElement))
         {
+            //swapping decisions
             swapOrAttack.swapToHighestHealth(partyHealths, partyAttacks, activeSlot, response);
-            /*
-            swapOrAttack.swapToNormal(enemyAtkElement, enemyStrElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
             
-            swapOrAttack.swapToOffensive(enemyAtkElement, enemyWeakElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
-            
-            swapOrAttack.swapToDefensive(enemyAtkElement, enemyStrElement, partyAtkElements, partyStrElements, partyHealths, activeSlot, response);
-            //swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
-            swapOrAttack.swapToWeakWinner(partyWinOrLose, partyLevels, activeSlot, response);
-            */
             if(!swapOrAttack.allIsNotWell(partyWinOrLose))
             {
                 swapOrAttack.swapToNormal(enemyAtkElement, enemyStrElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
@@ -686,11 +650,11 @@ string Trainer::makeMove(stringstream& situation)
                 swapOrAttack.swapToOffensive(enemyAtkElement, enemyWeakElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
                 
                 swapOrAttack.swapToDefensive(enemyAtkElement, enemyStrElement, partyAtkElements, partyStrElements, partyHealths, activeSlot, response);
-                //swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
+                
                 swapOrAttack.swapToWeakWinner(partyWinOrLose, partyLevels, activeSlot, response);
             }
             
-            //sole survivor
+            //if active creature is the sole survivor
             if(swapOrAttack.isLastCreatureStanding(partyHealths, activeSlot))
             {
                 response = "a";
@@ -701,7 +665,7 @@ string Trainer::makeMove(stringstream& situation)
                     swapOrAttack.reviveMostUsefulCreature(partyHealths, partyAttacks, response);
                 }
             }
-            //if next turn any one of other creatures will swap, thus making swapping to loop infinite!
+            //to avoid any infinite-looping swapping
             else if(swapOrAttack.areOthersGonnaDieAfterNextTurn(partyHealths, partyStrElements, partyWeakElements, enemyAttack, enemyAtkElement))
             {
                 response = "a";
@@ -711,55 +675,20 @@ string Trainer::makeMove(stringstream& situation)
                     swapOrAttack.useScroll(scrollPos, response);
                 }
                 
+                //if entire party doesn't stand a chance
                 if(!partyWinOrLose[activeSlot])
                 {
+                    //atkbst item
                     if(itemList[2] > 0)
                     {
                         response = "ab";
                     }
+                    //defbst item
                     if(itemList[1] > 0)
                     {
                         response = "db";
                     }
                 }
-                
-                 //(in-progress) LAST-HOPE STRATEGY TO END INFINITE SWAPPING!!!
-                /* ONLY WORKS IF AT LEAST ONE IN PARTY CAN DEFEAT ENEMY WHEN AT [FULL HEALTH - 1 x enemyAttack] (since enemy will always attack the swapped creature)
-                    When each is party is not at Max Health and cannot defeat enemy singlehandedly,
-                    find in the party at least one that can defeat enemy when at "full health".
-                    if there is, and it fainted, revive it immediately
-                    once it's alive, swap to any creature(that won't die when swapped) other than that "last Hope" creature or active creature.
-                    each turn, will automatically keep swapping until "last hope is at full health".
-                    Once it does, it will hopefully update the partyWinOrLose bool array,
-                    which stores each creature's true/false of defeating the enemy without dying.
-                    And the decision loop will normally swap to that creature.
-                    If, however, it still cannot win, or if none can win even at "full health" in the
-                    first place, the decision loop will run as it is.
-                    Still does not fix the occasional infinite swapping (i'll keep looking into that).
-                 */
-                /*
-                if(swapOrAttack.allIsNotWell(partyWinOrLose))
-                {
-                    if(swapOrAttack.thereisStillHope(partyLastHopes, lastHope))
-                    {
-                        //if hope has fainted
-                        if(swapOrAttack.isFainted(lastHope, partyHealths))
-                        {
-                            //rekindle!
-                            swapOrAttack.reviveCommand(lastHope, response);
-                        }
-                        else
-                        {
-                            //i really hope this works!
-                            swapOrAttack.swapToStall(partyHealths, partyStrElements, partyWeakElements, enemyAttack, enemyAtkElement, lastHope, activeSlot, response);
-                            //cout << "IT WORKED!!!!!!!!!!!!!!!!!!!!" << "\n";
-                        }
-                        //cout << "IT WORKED!!!!!!!!!!!!!!!!!!!!" << "\n";
-                        
-                        //cout << "Last hope: " << partyNames[lastHope] << "\n";
-                    }
-                }
-                 */
             }
         }
         
@@ -768,18 +697,9 @@ string Trainer::makeMove(stringstream& situation)
         {
             canFinishOff = false;
             
+            //swapping decisions
             swapOrAttack.swapToHighestHealth(partyHealths, partyAttacks, activeSlot, response);
-            /*
-            swapOrAttack.swapToNormal(enemyAtkElement, enemyStrElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
             
-            swapOrAttack.swapToOffensive(enemyAtkElement, enemyWeakElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
-            
-            swapOrAttack.swapToDefensive(enemyAtkElement, enemyStrElement, partyAtkElements, partyStrElements, partyHealths, activeSlot, response);
-            
-            //swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
-            swapOrAttack.swapToWeakWinner(partyWinOrLose, partyLevels, activeSlot, response);
-            //cout << response << "\n";
-            */
             if(!swapOrAttack.allIsNotWell(partyWinOrLose))
             {
                 swapOrAttack.swapToNormal(enemyAtkElement, enemyStrElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
@@ -787,15 +707,12 @@ string Trainer::makeMove(stringstream& situation)
                 swapOrAttack.swapToOffensive(enemyAtkElement, enemyWeakElement, partyAtkElements, partyWeakElements, partyHealths, activeSlot, response);
                 
                 swapOrAttack.swapToDefensive(enemyAtkElement, enemyStrElement, partyAtkElements, partyStrElements, partyHealths, activeSlot, response);
-                //swapOrAttack.swapToWinner(partyWinOrLose, partyHealths, activeSlot, response);
+                
                 swapOrAttack.swapToWeakWinner(partyWinOrLose, partyLevels, activeSlot, response);
             }
         }
     }
-    /* at end of decision loop,
-        if either/both canFinishOff or canScrollOff are true,
-        response will automatically be either attack/scroll
-     */
+
     if(canFinishOff)
     {
         response = "a";
@@ -812,21 +729,17 @@ string Trainer::makeMove(stringstream& situation)
     //if final response is attack
     if(response == "a")
     {
-        //deduct active creature's attack from enemy's current health
+        //update enemy's current health
         enemyCurrentHealth -= swapOrAttack.getFactoredAttack(activeAttack, enemyStrElement, enemyWeakElement, activeAtkElement);
     }
     
-    //if final response is scroll
-    //determine whether scroll has been used, in order to update enemy's current health
+    //determine if final response is scroll
     char c1 = response[0];
     char c2 = response[1];
     if(c1 == 's' && (c2 == 'a' || c2 == 'b' || c2 == 'c' || c2 == 'd' || c2 == 'e' || c2 == 'f' || c2 == 'g' || c2 == 'h'))
     {
         enemyCurrentHealth -= Item::SCROLL_DAMAGE;
     }
-    
-    //moveCount++;
-    //cout << "# of moves: " << moveCount << "\n";
     return response;
 }
 

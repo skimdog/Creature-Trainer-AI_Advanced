@@ -198,20 +198,6 @@ public:
      */
     bool calculateWinLose(int enemyAttack, string enemyAtkElement, string enemyWeakElement, string enemyStrElement, int enemyCurrentHealth, int partyAttacks[], string partyAtkElements[], string partyWeakElements[], string partyStrElements[], int partyHealths[], int slot, int activeSlot, bool lastHope);
     
-    /**
-     * Requires: Nothing.
-     * Modifies: Nothing.
-     * Effects:  Returns creature that will put an end to infinite swapping once and for all!!
-     */
-    bool thereisStillHope(bool partyLastHopes[], int& hopeSlot);
-    
-    /**
-     * Requires: Nothing.
-     * Modifies: Nothing.
-     * Effects:  Swap to any creature that won't die next turn
-     */
-    void swapToStall(int partyHealths[], string partyStrElements[], string partyWeakElements[], int enemyAttack, string enemyAttackElement, int hopeSlot, int activeSlot, string& response);
-    
 private:
     
     /**
